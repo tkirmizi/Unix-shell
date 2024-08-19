@@ -5,4 +5,8 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <fcntl.h>  
-#include <signal.h>
+
+int main(int argc, char **argv, char *env)
+{
+
+}
