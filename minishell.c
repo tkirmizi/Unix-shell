@@ -6,7 +6,7 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 15:29:49 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/09/02 13:46:17 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/09/02 17:57:23 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ int	main(int argc, char **argv, char **env)
 
 
 
-void	execution(t_ms *ms) // BENIM ANA EXECUTION
+void	execution(t_ms *ms) // main execution
 {
 	char  *path = "PATH";
 	t_ms *temp = ms;
@@ -165,5 +165,69 @@ void	do_pwd(t_ms *ms)
 
 void	do_env(t_ms *ms)
 {
-	printf("env will be done\n");
+	int	i;
+
+	i = 0;
+	while (ms->env[i])
+		printf("%s\n",ms->env[i++]);
+}
+
+void	do_export(t_ms *ms) // if just export without arguments what will happen ?
+{
+	int	i;
+
+	i = 1;
+	while (ms->cmd->args[i])
+	{
+		printf("%s kontrol edilior\n", ms->cmd->args[i]);
+		check_export_exist(ms, ms->cmd->args[i]);
+		i++;
+	}
+	i = 1;
+	// while (ms->cmd->args[i])
+	// {
+	// 	while (ms->env_s->next != NULL)
+	// 		ms->env_s = ms->env_s->next;
+	// 	ms->env_s->next->env_name = ms->cmd->args[0];
+	// 	ms->env
+	// }
+}
+
+
+void	check_export_exist(t_ms *ms, char *string)
+{
+t_ms *temp;
+    char *before_eq;
+    char *after_eq;
+
+    after_eq = ft_strnstr(string, "=", ft_strlen(string));
+    if (after_eq != NULL)
+    {
+        size_t before_len = after_eq - string;
+        before_eq = malloc(before_len + 1);
+        if (!before_eq)
+        {
+            perror("Failed to allocate memory");
+            exit(1);
+        }
+        strncpy(before_eq, string, before_len); // strncpy will be created
+        before_eq[before_len] = '\0';
+        
+        printf("before_eq = %s\n", before_eq);
+        free(before_eq);
+    }
+    
+    printf("after_eq = %s\n", after_eq);
+// 	while (ms->env_s->next != NULL)
+// 	{
+// 		if (!(ft_strncmp(ms->env_s->env_name, ms->cmd->args[0], sizeof(ms->cmd->args[0]))))
+// 		{
+// 			printf("it is exist\n");
+// 			free(ms->env_s->env_name);
+// 			free(ms->env_s->env_value);
+// 			temp->env_s->next = ms->env_s->next;
+// 		}
+// 		temp = ms;
+// 		ms->env_s = ms->env_s->next;
+// 	}
 }
