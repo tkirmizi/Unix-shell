@@ -6,7 +6,7 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 18:30:22 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/08/30 16:30:50 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/09/02 13:45:20 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,11 @@ typedef struct s_cmd
 	char **args; 
 }	t_cmd;
 
+typedef struct s_bin
+{
+	char	*builtin[7];
+}	t_bin;
+
 typedef struct s_mini
 {
 	t_cmd	*cmd;
@@ -39,6 +44,7 @@ typedef struct s_mini
 	char	**env;
 	char  **all_cmd_paths; // for all cmd paths such as /usr/bin or /usr/local/bin
 	// pid_t *pids;
+	t_bin bin;
 }	t_ms;
 
 typedef struct s_env
