@@ -6,7 +6,7 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 15:29:49 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/09/02 17:57:23 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/09/03 16:10:12 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,8 +150,8 @@ void	do_builtin(t_ms *ms)
 	// 	do_echo();
 	if (i == 3)
 		do_env(ms);
-	// if (i == 4)
-	// 	do_export();
+	if (i == 4)
+		do_export(&ms);
 	// if (i == 5)
 	// 	do_unset();
 	// if (i == 6)
@@ -172,62 +172,149 @@ void	do_env(t_ms *ms)
 		printf("%s\n",ms->env[i++]);
 }
 
-void	do_export(t_ms *ms) // if just export without arguments what will happen ?
+char	*ft_strncpy(char *dst, const char *src, int len)
 {
 	int	i;
 
-	i = 1;
-	while (ms->cmd->args[i])
+	i = 0;
+	if (!src)
+		return (NULL);
+	while (i < len && src[i])
 	{
-		printf("%s kontrol edilior\n", ms->cmd->args[i]);
-		check_export_exist(ms, ms->cmd->args[i]);
+		dst[i] = src[i];
 		i++;
 	}
-	i = 1;
-	// while (ms->cmd->args[i])
-	// {
-	// 	while (ms->env_s->next != NULL)
-	// 		ms->env_s = ms->env_s->next;
-	// 	ms->env_s->next->env_name = ms->cmd->args[0];
-	// 	ms->env
-	// }
+	while (i < len)
+	{
+		dst[i] = '\0';
+		i++;
+	}
+	return (dst);
 }
 
 
-void	check_export_exist(t_ms *ms, char *string)
+void	do_export(t_ms **ms) // if just export without arguments what will happen ?
 {
-t_ms *temp;
-    char *before_eq;
-    char *after_eq;
+	int	i;
+	t_ms *temp;
 
-    after_eq = ft_strnstr(string, "=", ft_strlen(string));
-    if (after_eq != NULL)
-    {
-        size_t before_len = after_eq - string;
-        before_eq = malloc(before_len + 1);
-        if (!before_eq)
-        {
-            perror("Failed to allocate memory");
-            exit(1);
-        }
-        strncpy(before_eq, string, before_len); // strncpy will be created
-        before_eq[before_len] = '\0';
-        
-        printf("before_eq = %s\n", before_eq);
-        free(before_eq);
-    }
-    
-    printf("after_eq = %s\n", after_eq);
-// 	while (ms->env_s->next != NULL)
-// 	{
-// 		if (!(ft_strncmp(ms->env_s->env_name, ms->cmd->args[0], sizeof(ms->cmd->args[0]))))
-// 		{
-// 			printf("it is exist\n");
-// 			free(ms->env_s->env_name);
-// 			free(ms->env_s->env_value);
-// 			temp->env_s->next = ms->env_s->next;
-// 		}
-// 		temp = ms;
-// 		ms->env_s = ms->env_s->next;
-// 	}
+	temp = (*ms);
+	i = 1;
+	while (temp->cmd->args[i])
+	{
+		check_export_exist(ms, temp->cmd->args[i]);
+		i++;
+	}
+	i = 1;
+	temp = (*ms);
+	while (temp->cmd->args[i])
+	{
+		export_itself(ms, temp->cmd->args[i]);
+		i++;
+	}
+	update_path(ms);
+	// ft_env_checker(&((*ms)->env_s));
+	// ft_env_double_checker((*ms)->env);
+}
+
+
+void	export_itself(t_ms **ms, char *string)
+{
+	t_env *temp;
+	char *before_eq = NULL;
+	char *after_eq;
+	int	before_len;
+
+	temp = (*ms)->env_s;
+	after_eq = ft_strnstr(string, "=", ft_strlen(string));
+	if (after_eq != NULL)
+	{
+		before_len = after_eq - string;
+		before_eq = malloc(before_len + 1);
+		if (!before_eq)
+		{
+			perror("Failed to allocate memory");
+			exit(1);
+		}
+		ft_strncpy(before_eq, string, before_len);
+		before_eq[before_len] = '\0';
+	}
+	while (temp-> next != NULL)
+	{
+		if (!(ft_strncmp(temp->env_name, before_eq, before_len)))
+		{
+			free(temp->env_value);
+			temp->env_value = ft_strdup(after_eq + 1);
+			break;
+		}
+		temp = temp->next;
+	}
+	if (temp->next == NULL)
+	{
+		temp->next = (t_env*)malloc(sizeof(t_env));
+		temp->next->env_name = ft_strdup(before_eq);
+		temp->next->env_value = ft_strdup(after_eq + 1);
+		temp->next->next = NULL;
+	}
+}
+
+
+void	check_export_exist(t_ms **ms, char *string)
+{
+	t_env *temp;
+	char *before_eq = NULL;
+	char *after_eq;
+	int	before_len;
+
+	temp = (*ms)->env_s;
+	after_eq = ft_strnstr(string, "=", ft_strlen(string));
+	if (after_eq != NULL)
+	{
+		before_len = after_eq - string;
+		before_eq = malloc(before_len + 1);
+		if (!before_eq)
+		{
+			perror("Failed to allocate memory");
+			exit(1);
+		}
+		ft_strncpy(before_eq, string, before_len);
+		before_eq[before_len] = '\0';
+	}
+	while (temp)
+	{
+		if (!(ft_strncmp(temp->env_name, before_eq, before_len)))
+		{
+			free(temp->env_value);
+			temp->env_value = strdup("");
+		}
+		temp = temp->next;
+	}
+	free(before_eq);
+}
+
+
+void	update_path(t_ms **ms)
+{
+	t_env	*temp;
+	int	i;
+
+	i = 0;
+	temp = (*ms)->env_s;
+	while (temp != NULL)
+	{
+		i++;
+		temp = temp->next;
+	}
+	(*ms)->env = (char**)malloc((i + 1) * sizeof(char *));
+	(*ms)->env[i] = NULL;
+	temp = (*ms)->env_s;
+	i = 0;
+	while (temp != NULL) // buraya niye girmiyor ?
+	{
+		(*ms)->env[i] = ft_strdup(temp->env_name);
+		(*ms)->env[i] = ft_strjoin((*ms)->env[i], "=");
+		(*ms)->env[i] = ft_strjoin((*ms)->env[i], temp->env_value);
+		i++;
+		temp = temp->next;
+	}
 }
