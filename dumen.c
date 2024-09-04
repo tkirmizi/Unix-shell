@@ -1,34 +1,47 @@
+// #include <stdio.h>
+// #include <unistd.h>
+// #include <stdlib.h>
+
+// char	*ft_strrchr(const char *s, int c)
+// {
+// 	unsigned int	i;
+// 	char			*res;
+// 	char			d;
+
+// 	i = 0;
+// 	d = c;
+// 	res = NULL;
+// 	while (s[i])
+// 	{
+// 		if (s[i] == d)
+// 			res = ((char *) &s[i]);
+// 		i++;
+// 	}
+// 	if (s[i] == d)
+// 		res = ((char *) &s[i]);
+// 	return (res);
+// }
+
+// int main(int argc, char *argv[])
+// {
+// 	char *pwd = "/Users/tkirmizi/my42projects/MINISHELL_ALL/minishell_area";
+// 	char	*newpwd;
+// 	newpwd = ft_strrchr(pwd, '/');
+// 	printf("newpwd = %s\n", newpwd);
+// }
+
+
 #include <stdio.h>
-#include <stdlib.h>
-
-#define NUM_BUILTINS 7
-
-typedef struct s_bin {
-    char *builtin[NUM_BUILTINS];
-} t_bin;
-
-typedef struct s_ms {
-    t_bin bin;
-} t_ms;
-
-void ft_set_builtin(t_ms *ms) {
-    ms->bin.builtin[0] = "cd";
-    ms->bin.builtin[1] = "pwd";
-    ms->bin.builtin[2] = "echo";
-    ms->bin.builtin[3] = "env";
-    ms->bin.builtin[4] = "export";
-    ms->bin.builtin[5] = "unset";
-    ms->bin.builtin[6] = "exit";
-}
+#include <string.h>
 
 int main() {
-    t_ms ms;
-    ft_set_builtin(&ms);
+    char path[] = "/Users/tkirmizi/my42projects/MINISHELL_ALL/minishell_area";
+    char *last_slash = strrchr(path, '/');  // Dizgedeki son slash'ı bulur
 
-    // Dizi elemanlarını yazdırarak kontrol edelim
-    for (int i = 0; i < NUM_BUILTINS; i++) {
-        printf("%s\n", ms.bin.builtin[i]);
-    }
+    if (last_slash != NULL) 
+        *last_slash++ = '\0';  // Son slash'ın bulunduğu yere null karakter ekler
+
+    printf("Son slash'a kadar olan kısım: %s\n", path);
 
     return 0;
 }

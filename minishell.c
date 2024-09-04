@@ -6,7 +6,7 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 15:29:49 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/09/04 12:14:03 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/09/04 18:56:20 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void	execution(t_ms *ms) // main execution
 	int	count_command;
 	count_command = ft_command_counter(ms->cmd);
 	
-	if (ft_is_builtin(ms))
+	if (ft_is_builtin(ms) != 10)
 		do_builtin(ms);
 	else
 	{
@@ -142,34 +142,44 @@ int ft_is_builtin(t_ms *ms)
 void	do_builtin(t_ms *ms)
 {
 	int i = ft_is_builtin(ms);
-	// if (i == 0)
-	// 	do_cd();
+	if (i == 0)
+		do_cd(&ms);
 	if (i == 1)
-		do_pwd(ms);
+		do_pwd(&ms);
 	// if (i == 2)
 	// 	do_echo();
 	if (i == 3)
-		do_env(ms);
+		do_env(&ms);
 	if (i == 4)
 		do_export(&ms);
-	// if (i == 5)
-	// 	do_unset();
+	if (i == 5)
+		do_unset(&ms);
 	// if (i == 6)
 	// 	do_exit();
 }
 
-void	do_pwd(t_ms *ms)
+void	do_pwd(t_ms **ms)
 {
-	printf("pwd will bi done\n");
+	t_env *temp;
+	temp = (*ms)->env_s;
+	while (temp)
+	{
+		if (!(ft_strncmp(temp->env_name, "PWD", 3)))
+			break;
+		temp = temp->next;
+	}
+	printf("%s\n", temp->env_value);
 }
 
-void	do_env(t_ms *ms)
+void	do_env(t_ms **ms)
 {
 	int	i;
+	t_ms *temp;
 
 	i = 0;
-	while (ms->env[i])
-		printf("%s\n",ms->env[i++]);
+	temp = (*ms);
+	while (temp->env[i])
+		printf("%s\n",temp->env[i++]);
 }
 
 char	*ft_strncpy(char *dst, const char *src, int len)
@@ -375,3 +385,60 @@ void	unset_else(t_ms **ms, t_env *temp, t_env *temp2, char *string)
 		free(temp);
 	}
 }
+
+void	do_cd(t_ms **ms)
+{
+	t_ms	*temp;
+
+	temp = (*ms);
+	char	*new_pwd;
+	if (temp->cmd->args[2])
+		printf("Only one path can be followed.\n");
+	else if (!(ft_strncmp(temp->cmd->args[1], "-", 2)))
+		new_pwd = find_last_part(ms);
+	else if (!(ft_strncmp(temp->cmd->args[1], "..", 3)))
+		new_pwd = find_prev_path(ms);
+	else if (!(ft_strncmp(temp->cmd->args[1], "/", 2)))
+		new_pwd = ft_strdup("/");
+	else
+		new_pwd = ft_strdup(temp->cmd->args[1]);
+	printf("pwd is %s\n", new_pwd);
+	if (access(new_pwd, F_OK))
+		printf("There is no such as path \n");
+
+}
+
+char	*find_prev_path(t_ms **ms)
+{
+	t_env	*temp;
+	char	*new_pwd;
+	char	*wbtrim;
+
+	temp = (*ms)->env_s;
+	while (temp)
+	{
+		if (!(ft_strncmp(temp->env_name, "PWD", 3)))
+			break;
+		temp = temp->next;
+	}
+	new_pwd = ft_strdup(temp->env_value);
+	wbtrim = ft_strrchr(new_pwd, '/');
+	*wbtrim = '\0';
+	return (new_pwd);
+}
+
+char	*find_last_part(t_ms **ms)
+{
+	t_env *temp;
+
+	temp = (*ms)->env_s;
+	while (temp)
+	{
+		if (!(ft_strncmp(temp->env_name, "OLDPWD", 6)))
+			break;
+		temp = temp->next;
+	}
+	return (temp->env_value);
+}
+
+// void	cd_itself() // asil burada olacak.
