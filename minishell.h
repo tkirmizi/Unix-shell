@@ -6,7 +6,7 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 18:30:22 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/09/02 13:45:20 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/09/05 16:30:12 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ typedef struct s_mini
 	char  **all_cmd_paths; // for all cmd paths such as /usr/bin or /usr/local/bin
 	// pid_t *pids;
 	t_bin bin;
+	int	exit_code;
 }	t_ms;
 
 typedef struct s_env

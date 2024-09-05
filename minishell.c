@@ -6,7 +6,7 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 15:29:49 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/09/04 18:56:20 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/09/05 16:30:01 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,16 +146,16 @@ void	do_builtin(t_ms *ms)
 		do_cd(&ms);
 	if (i == 1)
 		do_pwd(&ms);
-	// if (i == 2)
-	// 	do_echo();
+	if (i == 2)
+		do_echo(&ms);
 	if (i == 3)
 		do_env(&ms);
 	if (i == 4)
 		do_export(&ms);
 	if (i == 5)
 		do_unset(&ms);
-	// if (i == 6)
-	// 	do_exit();
+	if (i == 6)
+		do_exit(&ms);
 }
 
 void	do_pwd(t_ms **ms)
@@ -402,10 +402,65 @@ void	do_cd(t_ms **ms)
 		new_pwd = ft_strdup("/");
 	else
 		new_pwd = ft_strdup(temp->cmd->args[1]);
-	printf("pwd is %s\n", new_pwd);
 	if (access(new_pwd, F_OK))
 		printf("There is no such as path \n");
+	else
+	{
+		change_pwd_oldpwd(ms);
+		chdir_getcwd_all(ms, new_pwd);
+		update_path(ms);
+	}
 
+}
+
+void	change_pwd_oldpwd(t_ms **ms)
+{
+	t_env *temp;
+
+	char	*pwd_wcpy;
+	temp = (*ms)->env_s;
+	while (temp)
+	{
+		if (!(ft_strncmp(temp->env_name, "PWD", 3)))
+			break;
+		temp = temp->next;
+	}
+	pwd_wcpy = ft_strdup(temp->env_value);
+	free(temp->env_value);
+	temp = (*ms)->env_s;
+	while (temp)
+	{
+		if (!(ft_strncmp(temp->env_name, "OLDPWD", 6)))
+			break;
+		temp = temp->next;
+	}
+	free(temp->env_value);
+	temp->env_value = ft_strdup(pwd_wcpy);
+}
+
+void	chdir_getcwd_all(t_ms **ms, char *new_pwd)
+{
+	char	*cur_pwd;
+	int		pwd_len;
+	t_env	*temp;
+
+	temp = (*ms)->env_s;
+	pwd_len = ft_strlen(new_pwd) + 1;
+	cur_pwd = (char*)malloc((pwd_len) * sizeof(char));
+	cur_pwd[pwd_len - 1] = '\0';
+	if (chdir(new_pwd))
+	{
+		perror("Problem on changing directory\n");
+		exit(1); // will be changed ?
+	}
+	cur_pwd = getcwd(cur_pwd, pwd_len);
+	while (temp)
+	{
+		if (!(ft_strncmp(temp->env_name, "PWD", 3)))
+			break;
+		temp = temp->next;
+	}
+	temp->env_value = ft_strdup(cur_pwd);
 }
 
 char	*find_prev_path(t_ms **ms)
@@ -441,4 +496,122 @@ char	*find_last_part(t_ms **ms)
 	return (temp->env_value);
 }
 
-// void	cd_itself() // asil burada olacak.
+
+void	do_echo(t_ms **ms)
+{
+	t_cmd	*temp;
+	int	n_flag;
+	int	i;
+
+	i = 1;
+	n_flag = 0;
+	temp = (*ms)->cmd;
+	if (!temp->args[1])
+		printf("\n");
+	else
+		echo_w_args(ms, temp, n_flag, i);
+}
+
+void	echo_w_args(t_ms **ms, t_cmd *temp, int n_flag, int i)
+{
+	if (!(ft_strncmp(temp->args[1], "-n", 2)))
+		n_flag = 1;
+	if (n_flag == 1)
+		echo_n_flag(ms, temp);
+	else if (n_flag == 0)
+	{
+		while (temp->args[i])
+		{
+			echo_writter(ms, temp->args[i]);
+			if (temp->args[i+1])
+				printf(" ");
+			i++;
+		}
+	}
+}
+
+
+void	echo_n_flag(t_ms **ms, t_cmd *temp)
+{
+	int	i;
+	if (!temp->args[2])
+		;
+	else
+	{
+		i = 2;
+		while (temp->args[i])
+		{
+			echo_writter(ms, temp->args[i]);
+			if (temp->args[i+1])
+				printf(" ");
+			i++;
+		}
+		printf("\n");
+	}
+}
+
+void	echo_writter(t_ms **ms, char *string)
+{
+	t_env	*temp;
+	char	*after_dollar;
+
+	temp = (*ms)->env_s;
+	if (!(ft_strncmp(string, "$", 1)))
+	{
+		after_dollar = ft_strdup(string+1);
+		while (temp)
+		{
+			if (!ft_strncmp(after_dollar, temp->env_name, ft_strlen(after_dollar)))
+				printf("%s",temp->env_value);
+			temp = temp->next;
+		}
+	}
+	else
+		printf("%s", string);
+}
+
+
+void	do_exit(t_ms **ms)
+{
+	(*ms)->exit_code = 1;
+	ft_write_to_fd(STDERR_FILENO, "exit");
+	if ((*ms)->cmd->args[1] && (*ms)->cmd->args[2])
+		ft_write_to_fd(STDERR_FILENO, "too many arguments");
+	else if ((*ms)->cmd->args[1])
+	{
+		if (!(ft_is_num((*ms)->cmd->args[1])))
+		{
+			(*ms)->exit_code = 255;
+			ft_write_to_fd(STDERR_FILENO, "numeric argument required");
+		}
+		else 
+			(*ms)->exit_code =  ft_atoi((*ms)->cmd->args[1]);
+	}
+	else
+		(*ms)->exit_code = 0;
+	exit((*ms)->exit_code);
+}
+
+int	ft_is_num(char	*string)
+{
+	int	i;
+
+	i = 0;
+	while (string[i])
+	{
+		if (string[i] < 48 || string[i] > 57)
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
+void	ft_write_to_fd(int fd, char *string)
+{
+	int	i;
+
+	i = 0;
+	while (string[i])
+		write(fd, &string[i++], 1);
+	write(fd, "\n", 1);
+}
