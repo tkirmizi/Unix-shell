@@ -6,7 +6,7 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 15:29:49 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/09/05 16:30:01 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/09/06 10:41:41 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,6 +161,8 @@ void	do_builtin(t_ms *ms)
 void	do_pwd(t_ms **ms)
 {
 	t_env *temp;
+
+	(*ms)->exit_code = 1;
 	temp = (*ms)->env_s;
 	while (temp)
 	{
@@ -169,6 +171,7 @@ void	do_pwd(t_ms **ms)
 		temp = temp->next;
 	}
 	printf("%s\n", temp->env_value);
+	(*ms)->exit_code = 0;
 }
 
 void	do_env(t_ms **ms)
@@ -176,10 +179,12 @@ void	do_env(t_ms **ms)
 	int	i;
 	t_ms *temp;
 
+	(*ms)->exit_code = 1;
 	i = 0;
 	temp = (*ms);
 	while (temp->env[i])
 		printf("%s\n",temp->env[i++]);
+	(*ms)->exit_code = 0;
 }
 
 char	*ft_strncpy(char *dst, const char *src, int len)
@@ -208,6 +213,7 @@ void	do_export(t_ms **ms) // if just export without arguments what will happen ?
 	int	i;
 	t_ms *temp;
 
+	(*ms)->exit_code = 1;
 	temp = (*ms);
 	i = 1;
 	while (temp->cmd->args[i])
@@ -223,8 +229,7 @@ void	do_export(t_ms **ms) // if just export without arguments what will happen ?
 		i++;
 	}
 	update_path(ms);
-	// ft_env_checker(&((*ms)->env_s));
-	// ft_env_double_checker((*ms)->env);
+	(*ms)->exit_code = 0;
 }
 
 
@@ -334,6 +339,7 @@ void	do_unset(t_ms **ms)
 	t_env *temp;
 	int	i;
 
+	(*ms)->exit_code = 1;
 	i = 1;
 	temp = (*ms)->env_s;
 	while ((*ms)->cmd->args[i] != NULL)
@@ -341,6 +347,7 @@ void	do_unset(t_ms **ms)
 		unset_itself(ms, (*ms)->cmd->args[i]);
 		i++;
 	}
+	(*ms)->exit_code = 0;
 }
 void	unset_itself(t_ms **ms, char *string)
 {
@@ -503,6 +510,7 @@ void	do_echo(t_ms **ms)
 	int	n_flag;
 	int	i;
 
+	(*ms)->exit_code = 1;
 	i = 1;
 	n_flag = 0;
 	temp = (*ms)->cmd;
@@ -510,6 +518,7 @@ void	do_echo(t_ms **ms)
 		printf("\n");
 	else
 		echo_w_args(ms, temp, n_flag, i);
+	(*ms)->exit_code = 0;
 }
 
 void	echo_w_args(t_ms **ms, t_cmd *temp, int n_flag, int i)
