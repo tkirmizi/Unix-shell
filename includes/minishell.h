@@ -6,7 +6,7 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 18:30:22 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/09/05 16:30:12 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/09/09 11:05:30 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,5 +54,36 @@ typedef struct s_env
 	char *env_value;
 	struct s_env *next;
 }	t_env;
+
+void	execution(t_ms *ms); // main execution
+int		ft_command_counter(t_cmd *command);
+void	one_exec(t_ms *ms);
+void	arg_join(t_ms *ms);
+void	ft_set_builtin(t_ms *ms);
+int		ft_is_builtin(t_ms *ms);
+void	do_builtin(t_ms *ms);
+void	do_cd(t_ms **ms);
+void	change_pwd_oldpwd(t_ms **ms);
+void	chdir_getcwd_all(t_ms **ms, char *new_pwd);
+char	*find_prev_path(t_ms **ms);
+char	*find_last_part(t_ms **ms);
+void	do_echo(t_ms **ms);
+void	echo_w_args(t_ms **ms, t_cmd *temp, int n_flag, int i);
+void	echo_n_flag(t_ms **ms, t_cmd *temp);
+void	echo_writter(t_ms **ms, char *string);
+void	do_env(t_ms **ms);
+char	*ft_strncpy(char *dst, const char *src, int len);
+void	do_exit(t_ms **ms);
+int		ft_is_num(char	*string);
+void	ft_write_to_fd_nl(int fd, char *string);
+void	ft_write_to_fd(int fd, char *string);
+void	do_export(t_ms **ms);
+void	export_itself(t_ms **ms, char *string);
+void	check_export_exist(t_ms **ms, char *string);
+void	update_path(t_ms **ms);
+void	do_pwd(t_ms **ms);
+void	do_unset(t_ms **ms);
+void	unset_itself(t_ms **ms, char *string);
+void	unset_else(t_ms **ms, t_env *temp, t_env *temp2, char *string);
 
 #endif

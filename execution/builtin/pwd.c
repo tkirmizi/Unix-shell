@@ -1,22 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   minishell.c                                        :+:      :+:    :+:   */
+/*   pwd.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/08/19 15:29:49 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/09/09 11:01:43 by tkirmizi         ###   ########.fr       */
+/*   Created: 2024/09/09 10:55:24 by tkirmizi          #+#    #+#             */
+/*   Updated: 2024/09/09 10:55:38 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "includes/minishell.h"
 
-int	main(int argc, char **argv, char **env)
+void	do_pwd(t_ms **ms)
 {
-	t_ms *ms;
-	while (1)
+	t_env *temp;
+
+	(*ms)->exit_code = 1;
+	temp = (*ms)->env_s;
+	while (temp)
 	{
-		execution(ms->cmd);
+		if (!(ft_strncmp(temp->env_name, "PWD", 3)))
+			break;
+		temp = temp->next;
 	}
+	printf("%s\n", temp->env_value);
+	(*ms)->exit_code = 0;
 }

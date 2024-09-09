@@ -1,9 +1,9 @@
 NAME = minishell
-SRCS = minishell.c
+SRCS = minishell.c execution.c cd.c echo.c env.c export.c pwd.c unset.c
 OBJS = $(SRCS:.c=.o)
 
-LIBFT_PATH = ./Libft
-LIBFT_OBJS = ./Libft/libft.a
+LIBFT_PATH = ./includes/Libft
+LIBFT_OBJS = ./includes/Libft/libft.a
 
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
