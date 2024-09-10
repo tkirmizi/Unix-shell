@@ -6,22 +6,25 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 18:30:22 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/09/09 11:05:30 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/09/09 17:20:11 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-#include "Libft/libft.h"
-#include <unistd.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <sys/stat.h>
-#include <fcntl.h>  
-#include <signal.h>
+#include <unistd.h>
+#include <readline/history.h>
+#include <readline/readline.h>
 typedef struct s_cmd
 {
 	// t_token *token; lexer/parser partner will take care of it
@@ -46,6 +49,7 @@ typedef struct s_mini
 	// pid_t *pids;
 	t_bin bin;
 	int	exit_code;
+	char	*input;
 }	t_ms;
 
 typedef struct s_env
