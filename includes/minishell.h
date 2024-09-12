@@ -6,7 +6,7 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 18:30:22 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/09/09 17:20:11 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/09/12 18:08:56 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,8 @@ typedef struct s_cmd
 	int fd_in;
 	int fd_out;
 	char **args; 
+	char	**path_for_excat;
+	char	*builtin[7];
 }	t_cmd;
 
 typedef struct s_bin
@@ -60,12 +62,12 @@ typedef struct s_env
 }	t_env;
 
 void	execution(t_ms *ms); // main execution
-int		ft_command_counter(t_cmd *command);
-void	one_exec(t_ms *ms);
-void	arg_join(t_ms *ms);
-void	ft_set_builtin(t_ms *ms);
-int		ft_is_builtin(t_ms *ms);
-void	do_builtin(t_ms *ms);
+int		ft_command_counter(t_cmd **command);
+void	 one_exec(t_ms **ms, t_cmd **cmd);
+void	arg_join(t_ms **ms);
+void	ft_set_builtin(t_cmd *cmd);
+int ft_is_builtin(t_cmd **cmd);
+void	do_builtin(t_ms **ms, t_cmd **cmd);
 void	do_cd(t_ms **ms);
 void	change_pwd_oldpwd(t_ms **ms);
 void	chdir_getcwd_all(t_ms **ms, char *new_pwd);

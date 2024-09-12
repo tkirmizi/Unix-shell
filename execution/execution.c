@@ -3,99 +3,61 @@
 /*                                                        :::      ::::::::   */
 /*   execution.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: taha <taha@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/09 10:47:07 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/09/11 18:18:31 by taha             ###   ########.fr       */
+/*   Updated: 2024/09/12 18:05:09 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "includes/minishell.h"
 
-void	execution(t_ms *ms) // main execution
+void	execution(t_ms *ms) // BENIM ANA EXECUTION
 {
-	char  *path = "PATH";
-	t_ms *temp = ms;
 	int	count_command;
+
+	count_command = ft_command_counter(&(ms->cmd)); // adresi gonderilecek..
 	
-	count_command = ft_command_counter(ms->cmd);
-	
-	if (ft_is_builtin(ms) != 10)
-		do_builtin(ms);
+	if (count_command == 1) // one execution
+		one_exec(&ms, &(ms->cmd));
+	else
+		multi_exec(&ms, count_command);
+}
+
+void one_exec(t_ms **ms, t_cmd **cmd)
+{
+	int	i;
+	t_cmd *temp;
+
+	temp = (*cmd);
+	if (ft_is_builtin(cmd) != 10) // not working after going somewhere with 'cd'
+		do_builtin(ms, cmd);
 	else
 	{
-
-		while (temp->env_s != NULL)
-		{
-			if (ft_strncmp(temp->env_s->env_name, path, 4) == 0)
-				break;
-			temp->env_s = temp->env_s->next;
-		}
-		ms->all_cmd_paths = ft_split(temp->env_s->env_value, ':');
+		all_path_joiner (ms);
 		arg_join(ms);
-		// if (count_command == -5)
-		// 	problem 
-		if (count_command == 1) // one execution
-			one_exec(ms);
-		else
-			multi_exec(ms);
-	}
-}
-
-int		ft_command_counter(t_cmd *command)
-{
-	int	i;
-	
-	i = 0;
-	if (command -> args == NULL) // no args and what to do
-		return (i);
-	else if (command -> next == NULL && command -> args) 
-			return (1);
-	else
-	{
-		while (command -> next != NULL)
-		{
-			i++;
-			command = command -> next;
-		}
-		return (i + 1);
+		find_exact_path(cmd, &i);
+		ft_write_to_fd(2, (*cmd)->args[0]); // will be deleted
+		execve(temp->path_for_excat[i], temp->args, (*ms)->env);
 	}
 }
 
 
-void	one_exec(t_ms *ms)
-{
-	int	i;
-	
-	i = 0;
-	find_exact_path(ms, &i);
-	execve(ms->all_cmd_paths[i], ms->cmd->args, ms->env);
-}
-
-void	find_exact_path(t_ms *ms, int	*i)
-{
-	while (ms->all_cmd_paths[*i])  // while (pipex->path_ptr[*i])
-	{
-		if (access(ms->all_cmd_paths[*i], X_OK) == 0)
-			return ;
-		(*i)++;
-	}
-	// if it comes here means problem on find exact executable, so i have to handle it.
-}
-
-void	arg_join(t_ms *ms)
+void	arg_join(t_ms **ms)
 {
 	int		i;
 	char	*temp;
+	t_ms	*temp2;
 
+	temp2 = (*ms);
 	i = 0;
-	while (ms->all_cmd_paths[i])
+	while (temp2->cmd->path_for_excat[i])
 	{
-		temp = ms->all_cmd_paths[i];
-		ms->all_cmd_paths[i] = ft_strjoin(temp, "/");
+		temp = temp2->cmd->path_for_excat[i];
+		temp2->cmd->path_for_excat[i] = ft_strjoin(temp, "/");
 		free(temp);
-		temp = ms->all_cmd_paths[i];
-		ms->all_cmd_paths[i] = ft_strjoin(temp, ms->cmd->args[0]);
+		temp = temp2->cmd->path_for_excat[i];
+		temp2->cmd->path_for_excat[i] = ft_strjoin(temp, temp2->cmd->args[0]);
 		free(temp);
 		i++;
 	}
@@ -116,13 +78,13 @@ void	multi_exec(t_ms **ms, int c_command)
 	cmd = (*ms)->cmd;
 	while (cmd)
 	{
-		multi_exec_cont(cmd, pids, fds, i, c_command);
+		multi_exec_cont(ms, cmd, pids, fds, i, c_command);
 		i++;
 		cmd = cmd->next;
 	}
 }
 
-void	multi_exec_cont(t_cmd *cmd, pid_t *pids, int fds[][2], int i, int c_command)
+void	multi_exec_cont(t_ms **ms, t_cmd *cmd, pid_t *pids, int fds[][2], int i, int c_command)
 {
 	int	j;
 
@@ -134,14 +96,20 @@ void	multi_exec_cont(t_cmd *cmd, pid_t *pids, int fds[][2], int i, int c_command
 		{
 			cl_fds_first(fds, c_command);
 			dup2(fds[0][1], STDOUT_FILENO);
-			// execution
+			cmd = find_true_command(cmd, i);
+			ft_write_to_fd(2, "here is working");
+			ft_write_to_fd(2, cmd->args[0]);
+			one_exec(ms, &cmd); // cmdnin hangisi
 			close(fds[0][1]);
 		}
 		if (i == c_command - 1)
 		{
 			cl_fds_last(fds, c_command);
 			dup2(fds[c_command - 2][0], STDIN_FILENO);
-			// execution
+			cmd = find_true_command(cmd, i);
+			ft_write_to_fd(2, "here is working");
+			ft_write_to_fd(2, cmd->args[0]);
+			one_exec(ms, &cmd); // cmdnin hangisi
 			close(fds[c_command- 2][0]);
 		}
 		else
@@ -149,13 +117,26 @@ void	multi_exec_cont(t_cmd *cmd, pid_t *pids, int fds[][2], int i, int c_command
 			cl_fds_middle(fds, c_command, i);
 			dup2(fds[i - 1][0], STDIN_FILENO);
 			dup2(fds[i][1], STDOUT_FILENO);
-			//execution
+			cmd = find_true_command(cmd, i);
+			ft_write_to_fd(2, "here is working");
+			ft_write_to_fd(2, cmd->args[0]);
+			one_exec(ms, &cmd); // cmdnin hangisi
 			close(fds[i-1][0]);
 			close(fds[i][1]);
 		}
 	}
 	else
 		waitpid(pids[i], NULL, 0);
+}
+
+t_cmd *find_true_command(t_cmd *cmd, int i)
+{
+	int	j;
+
+	j = 0;
+	while (j < i)
+		cmd = cmd->next;
+	return (cmd);
 }
 
 void	cl_fds_first(int (*fds)[2], int c_command)
