@@ -6,7 +6,7 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/09 10:47:07 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/09/12 18:05:09 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/09/14 13:51:27 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,9 @@ void	execution(t_ms *ms) // BENIM ANA EXECUTION
 {
 	int	count_command;
 
-	count_command = ft_command_counter(&(ms->cmd)); // adresi gonderilecek..
+	count_command = ft_command_counter(&(ms->cmd));
 	
-	if (count_command == 1) // one execution
+	if (count_command == 1)
 		one_exec(&ms, &(ms->cmd));
 	else
 		multi_exec(&ms, count_command);
@@ -34,10 +34,9 @@ void one_exec(t_ms **ms, t_cmd **cmd)
 		do_builtin(ms, cmd);
 	else
 	{
-		all_path_joiner (ms);
-		arg_join(ms);
+		all_path_joiner (ms, cmd);
+		arg_join(cmd);
 		find_exact_path(cmd, &i);
-		ft_write_to_fd(2, (*cmd)->args[0]); // will be deleted
 		execve(temp->path_for_excat[i], temp->args, (*ms)->env);
 	}
 }
@@ -70,18 +69,22 @@ void	multi_exec(t_ms **ms, int c_command)
 	int	fds[c_command-1][2];
 	pid_t	*pids;
 
-	pids = (pid_t *)malloc(c_command * sizeof(pid_t));
+	pids = (pid_t *)malloc((c_command-1) * sizeof(pid_t));
 	i = 0;
 	while (i < c_command-1)
 		pipe(fds[i++]); // protection will come
 	i = 0;
 	cmd = (*ms)->cmd;
-	while (cmd)
+	while (cmd->next != NULL)
 	{
 		multi_exec_cont(ms, cmd, pids, fds, i, c_command);
 		i++;
 		cmd = cmd->next;
 	}
+	cl_fds_last(fds, c_command);
+	dup2(fds[c_command-2][0], STDIN_FILENO);
+	one_exec(ms, &cmd);
+	close(fds[c_command-2][0]);
 }
 
 void	multi_exec_cont(t_ms **ms, t_cmd *cmd, pid_t *pids, int fds[][2], int i, int c_command)
@@ -96,47 +99,23 @@ void	multi_exec_cont(t_ms **ms, t_cmd *cmd, pid_t *pids, int fds[][2], int i, in
 		{
 			cl_fds_first(fds, c_command);
 			dup2(fds[0][1], STDOUT_FILENO);
-			cmd = find_true_command(cmd, i);
-			ft_write_to_fd(2, "here is working");
-			ft_write_to_fd(2, cmd->args[0]);
-			one_exec(ms, &cmd); // cmdnin hangisi
+			one_exec(ms, &cmd);
 			close(fds[0][1]);
-		}
-		if (i == c_command - 1)
-		{
-			cl_fds_last(fds, c_command);
-			dup2(fds[c_command - 2][0], STDIN_FILENO);
-			cmd = find_true_command(cmd, i);
-			ft_write_to_fd(2, "here is working");
-			ft_write_to_fd(2, cmd->args[0]);
-			one_exec(ms, &cmd); // cmdnin hangisi
-			close(fds[c_command- 2][0]);
 		}
 		else
 		{
+			waitpid(pids[i-1], NULL, 0);
 			cl_fds_middle(fds, c_command, i);
-			dup2(fds[i - 1][0], STDIN_FILENO);
+			dup2(fds[i-1][0], STDIN_FILENO);
 			dup2(fds[i][1], STDOUT_FILENO);
-			cmd = find_true_command(cmd, i);
-			ft_write_to_fd(2, "here is working");
-			ft_write_to_fd(2, cmd->args[0]);
-			one_exec(ms, &cmd); // cmdnin hangisi
+			one_exec(ms, &cmd);
 			close(fds[i-1][0]);
 			close(fds[i][1]);
 		}
+		exit(EXIT_SUCCESS);
 	}
 	else
-		waitpid(pids[i], NULL, 0);
-}
-
-t_cmd *find_true_command(t_cmd *cmd, int i)
-{
-	int	j;
-
-	j = 0;
-	while (j < i)
-		cmd = cmd->next;
-	return (cmd);
+		return ;
 }
 
 void	cl_fds_first(int (*fds)[2], int c_command)
@@ -173,7 +152,9 @@ void	cl_fds_last(int (*fds)[2], int c_command)
 		while (j < 2)
 		{
 			if (i != c_command-2)
+			{
 				close(fds[i][j]);
+			}
 			j++;
 		}
 		i++;
