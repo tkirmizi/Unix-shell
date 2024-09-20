@@ -1,26 +1,30 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <termios.h>
 
 #define COUNT 2
 
 int main(int ac, char **av, char **env)
 {
-	int	fds[4][2];
-	int	i = 1; // ilk
-	int	j = 0;
-	int	k = 0;
+	struct termios oldterminos, newterminos;
 
-	while (j < 4)
-	{
-		if (j != i-1)
-			printf("close fds[%d][0]\n", j);
-		j++;
-	}
-	while (k < 4)
-	{
-		if (k != i)
-			printf("close [%d][1]\n", k);
-		k++;
-	}
+	if(tcgetattr(STDIN_FILENO, &oldterminos))
+		perror("Problem on tcgetattr\n");
+	printf("tcgetattr worked\n");
+	newterminos = oldterminos;
+	newterminos.c_lflag &= ~(ICANON | ECHO); 
+
+	if(tcsetattr(STDIN_FILENO, TCSANOW, &newterminos))
+		perror("problem on setattr\n");
+	
+	printf("input >\n");
+	
+	char ch;
+	while(read(STDIN_FILENO, &ch, 1) > 0 && ch != 'q')
+		printf("girdiniz = %c\n", ch);
+	
+	tcsetattr(STDIN_FILENO, TCSANOW, &oldterminos);
+	return (0);
+
 }
