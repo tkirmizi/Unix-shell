@@ -6,7 +6,7 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/09 10:57:47 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/09/09 10:58:11 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/09/23 17:55:02 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,13 +39,16 @@ void	echo_w_args(t_ms **ms, t_cmd *temp, int n_flag, int i)
 	{
 		while (temp->args[i])
 		{
-			echo_writter(ms, temp->args[i]);
+			printf("%s", temp->args[i]);
 			if (temp->args[i+1])
 				printf(" ");
+			else
+				printf("\n");
 			i++;
 		}
 	}
 }
+
 
 void	echo_n_flag(t_ms **ms, t_cmd *temp)
 {
@@ -57,31 +60,11 @@ void	echo_n_flag(t_ms **ms, t_cmd *temp)
 		i = 2;
 		while (temp->args[i])
 		{
-			echo_writter(ms, temp->args[i]);
+			printf("%s", temp->args[i]);
 			if (temp->args[i+1])
 				printf(" ");
 			i++;
 		}
-		printf("\n");
+		printf("%%\n");
 	}
-}
-
-void	echo_writter(t_ms **ms, char *string)
-{
-	t_env	*temp;
-	char	*after_dollar;
-
-	temp = (*ms)->env_s;
-	if (!(ft_strncmp(string, "$", 1)))
-	{
-		after_dollar = ft_strdup(string+1);
-		while (temp)
-		{
-			if (!ft_strncmp(after_dollar, temp->env_name, ft_strlen(after_dollar)))
-				printf("%s",temp->env_value);
-			temp = temp->next;
-		}
-	}
-	else
-		printf("%s", string);
 }

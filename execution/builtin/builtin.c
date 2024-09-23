@@ -6,7 +6,7 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/09 10:54:58 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/09/12 18:06:56 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/09/23 17:53:43 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@ void	ft_set_builtin(t_cmd *cmd)
 	cmd->builtin[3] = "env";
 	cmd->builtin[4] = "export";
 	cmd->builtin[5] = "unset";
-	cmd->builtin[6] = "exit";
 }
 
 int ft_is_builtin(t_cmd **cmd)
@@ -59,6 +58,4 @@ void	do_builtin(t_ms **ms, t_cmd **cmd)
 		do_export(ms);
 	if (i == 5)
 		do_unset(ms);
-	if (i == 6)
-		do_exit(ms);
 }

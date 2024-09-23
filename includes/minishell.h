@@ -6,7 +6,7 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 18:30:22 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/09/12 18:08:56 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/09/23 17:53:56 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ typedef struct s_cmd
 	int fd_out;
 	char **args; 
 	char	**path_for_excat;
-	char	*builtin[7];
+	char	*builtin[6];
 }	t_cmd;
 
 typedef struct s_bin
@@ -91,5 +91,6 @@ void	do_pwd(t_ms **ms);
 void	do_unset(t_ms **ms);
 void	unset_itself(t_ms **ms, char *string);
 void	unset_else(t_ms **ms, t_env *temp, t_env *temp2, char *string);
+void	one_exec_one(t_ms **ms, t_cmd **cmd);
 
 #endif
