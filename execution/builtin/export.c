@@ -6,13 +6,13 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/09 10:56:02 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/09/09 10:56:26 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/09/24 16:10:45 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "includes/minishell.h"
 
-void	do_export(t_ms **ms) // if just export without arguments what will happen ?
+void	do_export(t_ms **ms) // without argument will handle.
 {
 	int	i;
 	t_ms *temp;
@@ -77,7 +77,6 @@ void	export_itself(t_ms **ms, char *string)
 	}
 }
 
-
 void	check_export_exist(t_ms **ms, char *string)
 {
 	t_env *temp;
@@ -110,7 +109,6 @@ void	check_export_exist(t_ms **ms, char *string)
 	}
 	free(before_eq);
 }
-
 
 void	update_path(t_ms **ms)
 {

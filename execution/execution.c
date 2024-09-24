@@ -6,7 +6,7 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/09 10:47:07 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/09/23 17:51:52 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/09/24 16:08:08 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,11 @@
 void	execution(t_ms *ms)
 {
 	int	count_command;
+	int	status;
 
+	count_command = ft_command_counter(&(ms->cmd)); 
 	if (strcmp(ms->cmd->args[0], "exit") == 0)
 		do_exit(&ms);
-	count_command = ft_command_counter(&(ms->cmd)); 
-	
 	if (count_command == 1) 
 	{
 		if (ft_is_builtin(&(ms)->cmd)!= 10)
@@ -28,15 +28,19 @@ void	execution(t_ms *ms)
 		{
 			pid_t pid;
 			int	fds[1][2];
-			pipe(fds[0]);
+			if (pipe(fds[0]) == -1)
+				exit(ms->exit_code);
 			pid = fork();
+			if (pid < 0)
+				exit(ms->exit_code);
 			if (pid == 0)
-				one_exec_one(&ms, &(ms->cmd));
+				one_exec(&ms, &(ms->cmd));
 			else
 			{
-				waitpid(pid, NULL, 0);
+				waitpid(pid, &status, 0);
 				close(fds[0][1]);
 				close(fds[0][0]);
+				ms->exit_code = WEXITSTATUS(status);
 			}
 		}
 	}
@@ -51,45 +55,33 @@ void one_exec(t_ms **ms, t_cmd **cmd)
 
 	int	j = 0;
 	temp = (*cmd);
-	if (ft_is_builtin(cmd) != 10) // not working after going somewhere with 'cd'
-		do_builtin(ms, cmd);
-	else if (strchr((*cmd)->args[0], '/') != NULL)
+
+	if (strchr((*cmd)->args[0], '/') != NULL)
 	{
 		if (access((*cmd)->args[0], X_OK) == 0)
 		{
 			if (execve(temp->args[0], temp->args, (*ms)->env) == -1)
-				ft_write_to_fd(2, "exeution problem");// exit code will be update to 127
+			{
+				ft_write_to_fd(2, "execution problem");
+				(*ms)->exit_code = 127;
+				exit(127);
+			}
 		}
 		else
-			ft_write_to_fd(2, "execution problem");// exit code will be update to 127
+		{
+			ft_write_to_fd(2, "execution problem");
+			(*ms)->exit_code = 127;
+			exit(127);
+		}
 	}
 	else
 	{
 		all_path_joiner (ms, cmd);
 		arg_join(cmd);
-		find_exact_path(cmd, &i);
+		find_exact_path(ms, cmd, &i);
 		execve(temp->path_for_excat[i], temp->args, (*ms)->env);
-		exit(EXIT_FAILURE); // exit code ?
-	}
-}
-
-void	arg_join(t_cmd **cmd)
-{
-	int		i;
-	char	*temp;
-	t_cmd	*temp2;
-
-	temp2 = (*cmd);
-	i = 0;
-	while (temp2->path_for_excat[i])
-	{
-		temp = temp2->path_for_excat[i];
-		temp2->path_for_excat[i] = ft_strjoin(temp, "/");
-		free(temp);
-		temp = temp2->path_for_excat[i];
-		temp2->path_for_excat[i] = ft_strjoin(temp, temp2->args[0]);
-		free(temp);
-		i++;
+		(*ms)->exit_code = 1;
+		exit((*ms)->exit_code);
 	}
 }
 
@@ -100,6 +92,7 @@ void	 multi_exec(t_ms **ms, int c_command)
 	t_cmd	*cmd;
 	int	fds[c_command-1][2];
 	pid_t	*pids;
+	int	status;
 
 	pids = (pid_t *)malloc((c_command) * sizeof(pid_t)); // child process kadar
 	i = 0;
@@ -124,7 +117,8 @@ void	 multi_exec(t_ms **ms, int c_command)
 	i = 0;
 	while (i < c_command)
 	{
-		waitpid(pids[i], NULL, 0);  // Her child process için bekleme
+		waitpid(pids[i], &status, 0);
+		(*ms)->exit_code = WEXITSTATUS(status);
 		i++;
 	}
 }
@@ -141,14 +135,14 @@ void	multi_exec_cont(t_ms **ms, t_cmd *cmd, pid_t *pids, int fds[][2], int i, in
 		{
 			cl_fds_first(fds, c_command);
 			dup2(fds[0][1], STDOUT_FILENO);
-			one_exec(ms, &cmd);
+			exec_for_multi(ms, &cmd);
 			close(fds[0][1]);
 		}
 		else if(i == c_command-1)
 		{
 			cl_fds_last(fds, c_command);
 			dup2(fds[c_command-2][0], STDIN_FILENO);
-			one_exec(ms, &cmd);
+			exec_for_multi(ms, &cmd);
 			close(fds[c_command-2][0]);
 		}
 		else
@@ -156,7 +150,7 @@ void	multi_exec_cont(t_ms **ms, t_cmd *cmd, pid_t *pids, int fds[][2], int i, in
 			cl_fds_middle(fds, c_command, i);
 			dup2(fds[i-1][0], STDIN_FILENO);
 			dup2(fds[i][1], STDOUT_FILENO);
-			one_exec(ms, &cmd);
+			exec_for_multi(ms, &cmd);
 			close(fds[i-1][0]);
 			close(fds[i][1]);
 		}
@@ -165,6 +159,62 @@ void	multi_exec_cont(t_ms **ms, t_cmd *cmd, pid_t *pids, int fds[][2], int i, in
 	else
 		return ;
 }
+
+void exec_for_multi(t_ms **ms, t_cmd **cmd)
+{
+	int	i;
+	t_cmd *temp;
+
+	int	j = 0;
+	temp = (*cmd);
+	if (ft_is_builtin(cmd) != 10)
+		do_builtin(ms, cmd);
+	else if (strchr((*cmd)->args[0], '/') != NULL)
+	{
+		if (access((*cmd)->args[0], X_OK) == 0)
+		{
+			if (execve(temp->args[0], temp->args, (*ms)->env) == -1)
+			{
+				ft_write_to_fd(2, "exeution problem");// exit code will be update to 127
+				exit(127);
+			}
+		}
+		else
+		{
+			ft_write_to_fd(2, "execution problem");
+			exit(127);
+		}
+	}
+	else
+	{
+		all_path_joiner (ms, cmd);
+		arg_join(cmd);
+		find_exact_path(ms, cmd, &i);
+		execve(temp->path_for_excat[i], temp->args, (*ms)->env);
+		exit(EXIT_FAILURE);
+	}
+}
+
+void	arg_join(t_cmd **cmd)
+{
+	int		i;
+	char	*temp;
+	t_cmd	*temp2;
+
+	temp2 = (*cmd);
+	i = 0;
+	while (temp2->path_for_excat[i])
+	{
+		temp = temp2->path_for_excat[i];
+		temp2->path_for_excat[i] = ft_strjoin(temp, "/");
+		free(temp);
+		temp = temp2->path_for_excat[i];
+		temp2->path_for_excat[i] = ft_strjoin(temp, temp2->args[0]);
+		free(temp);
+		i++;
+	}
+}
+
 
 void	cl_fds_first(int (*fds)[2], int c_command)
 {
@@ -226,33 +276,5 @@ void	cl_fds_middle(int (*fds)[2], int c_command, int i)
 		if (k != i)
 			close(fds[k][1]);
 		k++;
-	}
-}
-
-void one_exec_one(t_ms **ms, t_cmd **cmd)
-{
-	int	i;
-	t_cmd *temp;
-
-	int	j = 0;
-	temp = (*cmd);
-
-	if (strchr((*cmd)->args[0], '/') != NULL)
-	{
-		if (access((*cmd)->args[0], X_OK) == 0)
-		{
-			if (execve(temp->args[0], temp->args, (*ms)->env) == -1)
-				ft_write_to_fd(2, "exeution problem");// exit code will be update to 127
-		}
-		else
-			ft_write_to_fd(2, "execution problem");// exit code will be update to 127
-	}
-	else
-	{
-		all_path_joiner (ms, cmd);
-		arg_join(cmd);
-		find_exact_path(cmd, &i);
-		execve(temp->path_for_excat[i], temp->args, (*ms)->env);
-		exit(EXIT_FAILURE); // exit code ?
 	}
 }

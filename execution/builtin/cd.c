@@ -6,7 +6,7 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/09 10:57:04 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/09/23 17:55:21 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/09/24 16:09:16 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ void	do_cd(t_ms **ms)
 {
 	t_ms	*temp;
 
+	(*ms)->exit_code = 1;
 	temp = (*ms);
 	char	*new_pwd;
 	if (temp->cmd->args[2])
@@ -35,7 +36,7 @@ void	do_cd(t_ms **ms)
 		change_pwd_oldpwd(ms);
 		chdir_getcwd_all(ms, new_pwd);
 		update_path(ms);
-		// exit(EXIT_SUCCESS);
+		(*ms)->exit_code = 0;
 	}
 }
 
