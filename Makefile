@@ -1,32 +1,40 @@
 NAME = minishell
-SRCS = minishell.c execution.c cd.c echo.c env.c export.c pwd.c unset.c
+
+CC = gcc -g
+#CFLAGS = -Wall -Wextra -Werror
+LDFLAGS = -L./libft -lft -lreadline
+
+LIBFT = libft/libft.a
+LIBFT_DIR = libft
+
+SRCS = minishell.c \
+		signal_handler.c \
+		lex.c \
+
 OBJS = $(SRCS:.c=.o)
 
-LIBFT_PATH = ./includes/Libft
-LIBFT_OBJS = ./includes/Libft/libft.a
+all: $(LIBFT) $(NAME)
 
-CC = cc
-CFLAGS = -Wall -Wextra -Werror
-RM = rm -rf
+$(NAME): $(OBJS) $(LIBFT)
+	@$(CC) $(CFLAGS) $(OBJS) -o $(NAME) $(LDFLAGS)
 
-all = $(NAME)
+$(LIBFT):
+	@echo "Making Libft..."
+	make -sC $(LIBFT_DIR)
 
-$(LIBFT_OBJS):
-	make -C $(LIBFT_PATH)
-
-$(NAME): $(LIBFT_OBJS) $(OBJS)
-	$(CC) $(CFLAGS) $(LIBFT_OBJS) $(OBJS) -o $(NAME)
-	$(RM) $(OBJS)
-
-%o: $.c
-	$(CC) $(CFLAGS) -c $< -o <@
-
+%.o: %.c
+	@$(CC) $(CFLAGS) -c $< -o $@
+	
 clean:
-	$(RM) $(OBJS)
-	make clean -C $(LIBFT_PATH)
+	rm -f $(OBJS) $(LIBFT_DIR)/*.o
+	@make -sC $(LIBFT_DIR) clean
+	
+fclean: clean
+	rm -f $(NAME)
+	@make -sC $(LIBFT_DIR) fclean
 
-fclean:
-	$(RM) $(NAME)
-	$(RM) $(OBJS)
-	$(RM) $(LIBFT_OBJS)
 re: fclean all
+
+ac: all clean
+
+.PHONY: all clean fclean re
