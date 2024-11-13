@@ -6,44 +6,40 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 10:49:58 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/12 10:50:02 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/13 12:16:25 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 
-void leaks (void)
-{
-	system("leaks minishell");
-}
-
-
-
 int g_signal = 0;
 
-void free_commands(t_cmd *cmd) {
-  t_cmd *tmp;
-  int i;
+void free_commands(t_cmd *cmd)
+{
+	t_cmd *tmp;
+	int i;
 
 	tmp = NULL;
 	while (cmd)
 	{
-	tmp = cmd->next;
-	i = 0;
-	while (cmd->args && cmd->args[i])
-	  free(cmd->args[i++]);
-	free(cmd->args);
-	free(cmd);
-	cmd = tmp;
+		tmp = cmd->next;
+		i = 0;
+		while (cmd->args && cmd->args[i])
+			free(cmd->args[i++]);
+		free(cmd->args);
+		free(cmd);
+		cmd = tmp;
 	}
 }
 
-int not_empty(const char *input) {
-  int i;
+int not_empty(const char *input)
+{
+	int i;
 
 	i = 0;
-	while (input[i]) {
+	while (input[i])
+	{
 		if (input[i] != ' ' && input[i] != '\t')
 			return (1);
 		i++;
@@ -51,7 +47,8 @@ int not_empty(const char *input) {
 	return (0);
 }
 
-int wrong_input(char *input) {
+int wrong_input(char *input)
+{
 	if (!input)
 		return (printf("ERROR! No input"), 0);
 	if (ft_strlen(input) == 0 || input[0] == '\0' || !not_empty(input))
@@ -78,10 +75,10 @@ int process(t_ms *ms)
 	return (free_commands(ms->cmd), free(ms->input), 1);
 }
 
-void	update_shell_lvl(t_ms **ms)
+void update_shell_lvl(t_ms **ms)
 {
-	t_env	*temp;
-	int	new_shlvl;
+	t_env *temp;
+	int new_shlvl;
 
 	temp = (*ms)->env_s;
 	while (temp)
@@ -96,8 +93,7 @@ void	update_shell_lvl(t_ms **ms)
 	// update_path(ms);
 }
 
-
-void	ft_set_builtin(t_cmd *cmd)
+void ft_set_builtin(t_cmd *cmd)
 {
 	cmd->builtin[0] = "cd";
 	cmd->builtin[1] = "pwd";
@@ -115,7 +111,7 @@ int ft_is_builtin(t_cmd **cmd)
 	i = 0;
 	temp = (*cmd);
 	ft_set_builtin(*cmd);
-	
+
 	while (i < 6)
 	{
 		if (!(ft_strncmp((*cmd)->args[0], (*cmd)->builtin[i], ft_strlen((*cmd)->args[0]))))
@@ -125,49 +121,50 @@ int ft_is_builtin(t_cmd **cmd)
 	return (10);
 }
 
-
-void	do_env(t_ms **ms)
+void do_env(t_ms **ms)
 {
-	int	i;
+	int i;
 	t_ms *temp;
 
 	(*ms)->exit_code = 1;
-	i = 0;
+	i = -1;
 	temp = (*ms);
-	dup2((*ms)->cmd->fd_in, STDIN_FILENO);
-	dup2((*ms)->cmd->fd_out, STDOUT_FILENO);
-	while (temp->env[i])
-		printf("%s\n",temp->env[i++]);
+	redir_for_builtin(ms);
+	while (temp->env[++i])
+	{
+		write(STDOUT_FILENO, temp->env[i], ft_strlen(temp->env[i]));
+		write(STDOUT_FILENO, "\n", 1);
+	}
 	(*ms)->exit_code = 0;
 }
 
-int		ft_command_counter(t_cmd **command)
+int ft_command_counter(t_cmd **command)
 {
 	t_cmd *temp;
-	int	i;
+	int i;
 
 	i = 0;
 	temp = (*command);
-	if (temp -> args == NULL)
+	if (temp->args == NULL)
 		return (i);
 	else
 	{
-		if (temp -> next == NULL)
+		if (temp->next == NULL)
 			return (1);
 		else
 		{
-			while (temp -> next != NULL)
+			while (temp->next != NULL)
 			{
 				i++;
-				temp = temp -> next;
+				temp = temp->next;
 			}
 			return (i + 1);
 		}
 	}
-	return (-5); // problem.
+	return (-5);
 }
 
-void  find_exact_path(t_ms **ms, t_cmd **cmd, int	*i)
+void find_exact_path(t_ms **ms, t_cmd **cmd, int *i)
 {
 	t_cmd *temp;
 
@@ -176,16 +173,16 @@ void  find_exact_path(t_ms **ms, t_cmd **cmd, int	*i)
 	while (temp->path_for_excat[*i])
 	{
 		if (access(temp->path_for_excat[*i], X_OK | F_OK) == 0)
-			return ;
+			return;
 		(*i)++;
 	}
 	ft_write_to_fd(2, "command not found\n");
 	exit(127);
 }
 
-char	*ft_strncpy(char *dst, const char *src, int len)
+char *ft_strncpy(char *dst, const char *src, int len)
 {
-	int	i;
+	int i;
 
 	i = 0;
 	if (!src)
@@ -203,9 +200,9 @@ char	*ft_strncpy(char *dst, const char *src, int len)
 	return (dst);
 }
 
-void	do_export(t_ms **ms) // if just export without arguments what will happen ?
+void do_export(t_ms **ms)
 {
-	int	i;
+	int i;
 	t_ms *temp;
 
 	(*ms)->exit_code = 1;
@@ -227,57 +224,34 @@ void	do_export(t_ms **ms) // if just export without arguments what will happen ?
 	(*ms)->exit_code = 0;
 }
 
-
-void	export_itself(t_ms **ms, char *string)
+void export_itself_cont(t_env *temp, char *before_eq, char *after_eq, int before_len)
 {
-	t_env *temp;
-	char *before_eq = NULL;
-	char *after_eq;
-	int	before_len;
-
-	temp = (*ms)->env_s;
-	after_eq = ft_strnstr(string, "=", ft_strlen(string));
-	if (after_eq != NULL)
-	{
-		before_len = after_eq - string;
-		before_eq = malloc(before_len + 1);
-		if (!before_eq)
-		{
-			perror("Failed to allocate memory");
-			exit(1);
-		}
-		ft_strncpy(before_eq, string, before_len);
-		before_eq[before_len] = '\0';
-	}
-	while (temp-> next != NULL)
+	while (temp->next != NULL)
 	{
 		if (!(ft_strncmp(temp->env_name, before_eq, before_len)))
 		{
 			free(temp->env_value);
 			temp->env_value = ft_strdup(after_eq + 1);
-			break;
+			return;
 		}
 		temp = temp->next;
 	}
-	if (temp->next == NULL)
-	{
-		temp->next = (t_env*)malloc(sizeof(t_env));
-		temp->next->env_name = ft_strdup(before_eq);
-		temp->next->env_value = ft_strdup(after_eq + 1);
-		temp->next->next = NULL;
-	}
+	temp->next = (t_env *)malloc(sizeof(t_env));
+	temp->next->env_name = ft_strdup(before_eq);
+	temp->next->env_value = ft_strdup(after_eq + 1);
+	temp->next->next = NULL;
 }
 
-
-void	check_export_exist(t_ms **ms, char *string)
+void export_itself(t_ms **ms, char *string)
 {
 	t_env *temp;
-	char *before_eq = NULL;
+	char *before_eq;
 	char *after_eq;
-	int	before_len;
+	int before_len;
 
 	temp = (*ms)->env_s;
 	after_eq = ft_strnstr(string, "=", ft_strlen(string));
+	before_eq = NULL;
 	if (after_eq != NULL)
 	{
 		before_len = after_eq - string;
@@ -290,6 +264,11 @@ void	check_export_exist(t_ms **ms, char *string)
 		ft_strncpy(before_eq, string, before_len);
 		before_eq[before_len] = '\0';
 	}
+	export_itself_cont(temp, before_eq, after_eq, before_len);
+}
+
+static void check_exp_exist_cont(t_env *temp, char *before_eq, int before_len)
+{
 	while (temp)
 	{
 		if (!(ft_strncmp(temp->env_name, before_eq, before_len)))
@@ -299,28 +278,38 @@ void	check_export_exist(t_ms **ms, char *string)
 		}
 		temp = temp->next;
 	}
+}
+
+void check_export_exist(t_ms **ms, char *string)
+{
+	t_env *temp;
+	char *before_eq;
+	char *after_eq;
+	int before_len;
+
+	temp = (*ms)->env_s;
+	after_eq = ft_strnstr(string, "=", ft_strlen(string));
+	before_eq = NULL;
+	if (after_eq != NULL)
+	{
+		before_len = after_eq - string;
+		before_eq = malloc(before_len + 1);
+		if (!before_eq)
+		{
+			perror("Failed to allocate memory");
+			exit(1);
+		}
+		ft_strncpy(before_eq, string, before_len);
+		before_eq[before_len] = '\0';
+	}
+	check_exp_exist_cont(temp, before_eq, before_len);
 	free(before_eq);
 }
 
-
-void	update_path(t_ms **ms) // will be used also for unset
+static void fill_array(t_ms **ms, t_env *temp, int i)
 {
-	t_env	*temp;
-	int		i;
-	char	*tmp;
+	char *tmp;
 
-	i = 0;
-	temp = (*ms)->env_s;
-	// free_dbl_ptr((*ms)->env);
-	while (temp != NULL)
-	{
-		i++;
-		temp = temp->next;
-	}
-	(*ms)->env = (char**)malloc((i + 1) * sizeof(char *));
-	(*ms)->env[i] = NULL;
-	temp = (*ms)->env_s;
-	i = 0;
 	while (temp != NULL)
 	{
 		(*ms)->env[i] = ft_strdup(temp->env_name);
@@ -335,8 +324,29 @@ void	update_path(t_ms **ms) // will be used also for unset
 	}
 }
 
+void update_path(t_ms **ms)
+{
+	t_env *temp;
+	int i;
+	char **old_env;
 
-void	free_dbl_ptr(char **string)
+	i = 0;
+	temp = (*ms)->env_s;
+	while (temp != NULL)
+	{
+		i++;
+		temp = temp->next;
+	}
+	old_env = (*ms)->env;
+	(*ms)->env = (char **)malloc((i + 1) * sizeof(char *));
+	(*ms)->env[i] = NULL;
+	temp = (*ms)->env_s;
+	fill_array(ms, temp, 0);
+	if (old_env)
+		free_dbl_ptr(old_env);
+}
+
+void free_dbl_ptr(char **string)
 {
 	int i = 0;
 
@@ -347,15 +357,14 @@ void	free_dbl_ptr(char **string)
 			free(string[i]);
 			i++;
 		}
-		// free(string);
+		free(string);
 	}
 }
 
-
-void	do_unset(t_ms **ms)
+void do_unset(t_ms **ms)
 {
 	t_env *temp;
-	int	i;
+	int i;
 
 	(*ms)->exit_code = 1;
 	i = 1;
@@ -367,7 +376,7 @@ void	do_unset(t_ms **ms)
 	}
 	(*ms)->exit_code = 0;
 }
-void	unset_itself(t_ms **ms, char *string)
+void unset_itself(t_ms **ms, char *string)
 {
 	t_env *temp;
 	t_env *temp2;
@@ -393,7 +402,7 @@ void	unset_itself(t_ms **ms, char *string)
 		update_path(ms);
 	}
 }
-void	unset_else(t_ms **ms, t_env *temp, t_env *temp2, char *string)
+void unset_else(t_ms **ms, t_env *temp, t_env *temp2, char *string)
 {
 	if (!(ft_strncmp(temp->env_name, (*ms)->env_s->env_name, ft_strlen(temp->env_name))))
 	{
@@ -411,13 +420,13 @@ void	unset_else(t_ms **ms, t_env *temp, t_env *temp2, char *string)
 	}
 }
 
-void	do_cd(t_ms **ms)
+void do_cd(t_ms **ms)
 {
-	t_ms	*temp;
+	t_ms *temp;
 
 	(*ms)->exit_code = 1;
 	temp = (*ms);
-	char	*new_pwd;
+	char *new_pwd;
 	if (temp->cmd->args[2])
 		printf("Only one path can be followed.\n");
 	else if (!(ft_strncmp(temp->cmd->args[1], "-", 2)))
@@ -439,11 +448,11 @@ void	do_cd(t_ms **ms)
 	}
 }
 
-void	change_pwd_oldpwd(t_ms **ms)
+void change_pwd_oldpwd(t_ms **ms)
 {
 	t_env *temp;
 
-	char	*pwd_wcpy;
+	char *pwd_wcpy;
 	temp = (*ms)->env_s;
 	while (temp)
 	{
@@ -464,15 +473,15 @@ void	change_pwd_oldpwd(t_ms **ms)
 	temp->env_value = ft_strdup(pwd_wcpy);
 }
 
-void	chdir_getcwd_all(t_ms **ms, char *new_pwd)
+void chdir_getcwd_all(t_ms **ms, char *new_pwd)
 {
-	char	*cur_pwd;
-	int		pwd_len;
-	t_env	*temp;
+	char *cur_pwd;
+	int pwd_len;
+	t_env *temp;
 
 	temp = (*ms)->env_s;
 	pwd_len = ft_strlen(new_pwd) + 1;
-	cur_pwd = (char*)malloc((pwd_len) * sizeof(char));
+	cur_pwd = (char *)malloc((pwd_len) * sizeof(char));
 	cur_pwd[pwd_len - 1] = '\0';
 	if (chdir(new_pwd))
 	{
@@ -489,11 +498,11 @@ void	chdir_getcwd_all(t_ms **ms, char *new_pwd)
 	temp->env_value = ft_strdup(cur_pwd);
 }
 
-char	*find_prev_path(t_ms **ms)
+char *find_prev_path(t_ms **ms)
 {
-	t_env	*temp;
-	char	*new_pwd;
-	char	*wbtrim;
+	t_env *temp;
+	char *new_pwd;
+	char *wbtrim;
 
 	temp = (*ms)->env_s;
 	while (temp)
@@ -508,30 +517,11 @@ char	*find_prev_path(t_ms **ms)
 	return (new_pwd);
 }
 
-// char	*cur_pwd_return(t_ms **ms)
-// {
-// 	t_env *temp;
-// 	char	*new_pwd;
-
-// 	temp = (*ms)->env_s;
-// 	while (temp)
-// 	{
-// 		if (!(ft_strncmp(temp->env_name, "PWD", 3)))
-// 			break;
-// 		temp = temp->next;
-// 	}
-// 	new_pwd = ft_strdup(temp->env_value);
-// 	new_pwd = ft_strjoin(new_pwd, "/");
-// 	new_pwd = ft_strjoin(new_pwd, (*ms)->cmd->args[1]);
-// 	return new_pwd;
-// }
-
-
-char	*cur_pwd_return(t_ms **ms)
+char *cur_pwd_return(t_ms **ms)
 {
-	t_env	*temp;
-	char	*new_pwd;
-	char	*tmp;
+	t_env *temp;
+	char *new_pwd;
+	char *tmp;
 
 	temp = (*ms)->env_s;
 	while (temp)
@@ -541,7 +531,7 @@ char	*cur_pwd_return(t_ms **ms)
 		temp = temp->next;
 	}
 	new_pwd = ft_strdup(temp->env_value);
-	tmp = new_pwd; 
+	tmp = new_pwd;
 	new_pwd = ft_strjoin(new_pwd, "/");
 	free(tmp);
 	tmp = new_pwd;
@@ -550,7 +540,7 @@ char	*cur_pwd_return(t_ms **ms)
 	return (new_pwd);
 }
 
-char	*find_last_part(t_ms **ms)
+char *find_last_part(t_ms **ms)
 {
 	t_env *temp;
 
@@ -564,8 +554,7 @@ char	*find_last_part(t_ms **ms)
 	return (temp->env_value);
 }
 
-
-void	do_builtin(t_ms **ms, t_cmd **cmd)
+void do_builtin(t_ms **ms, t_cmd **cmd)
 {
 	int i;
 
@@ -584,109 +573,97 @@ void	do_builtin(t_ms **ms, t_cmd **cmd)
 		do_unset(ms);
 }
 
-// void	do_pwd(t_ms **ms)
-// {
-// 	t_env *temp;
-
-// 	(*ms)->exit_code = 1;
-// 	temp = (*ms)->env_s;
-// 	while (temp)
-// 	{
-// 		if (!(ft_strncmp(temp->env_name, "PWD", 3)))
-// 			break;
-// 		temp = temp->next;
-// 	}
-// 	printf("%s\n", temp->env_value);
-// 	(*ms)->exit_code = 0;
-// }
-
-void	do_pwd(t_ms **ms)
+void do_pwd(t_ms **ms)
 {
-	t_env	*temp;
-	int		i;
-	int		len;
+	t_env *temp;
+	int i;
+	int len;
 
 	i = 0;
 	(*ms)->exit_code = 1;
 	temp = (*ms)->env_s;
+	redir_for_builtin(ms);
 	while (temp)
 	{
 		if (!(ft_strncmp(temp->env_name, "PWD", 3)))
 			break;
 		temp = temp->next;
 	}
-	dup2((*ms)->cmd->fd_out, STDOUT_FILENO);
-	dup2((*ms)->cmd->fd_in, STDIN_FILENO);
 	len = ft_strlen(temp->env_value);
 	write(STDOUT_FILENO, temp->env_value, len);
 	write(STDOUT_FILENO, "\n", 1);
-	// close((*ms)->cmd->fd_out);
-	// printf("%s\n", temp->env_value);
-	dup2(STDOUT_FILENO, (*ms)->cmd->fd_out);
-	dup2(STDIN_FILENO, (*ms)->cmd->fd_in);
 	(*ms)->exit_code = 0;
 }
 
-void	do_echo(t_ms **ms)
+void do_echo(t_ms **ms)
 {
-	t_cmd	*temp;
-	int	n_flag;
-	int	i;
+	t_cmd *temp;
+	int n_flag;
+	int i;
 
-	(*ms)->exit_code = 1;
+	if (!ms || !*ms || !(*ms)->cmd)
+		return;
+	temp = (*ms)->cmd;
 	i = 1;
 	n_flag = 0;
-	temp = (*ms)->cmd;
-	dup2((*ms)->cmd->fd_in, STDIN_FILENO);
-	dup2((*ms)->cmd->fd_out, STDOUT_FILENO);
-	if (!temp->args[1])
-		printf("\n");
-	else
-		echo_w_args(ms, temp, n_flag, i);
-	(*ms)->exit_code = 0;
-}
-
-void	echo_w_args(t_ms **ms, t_cmd *temp, int n_flag, int i)
-{
-	if (!(ft_strncmp(temp->args[1], "-n", 2)))
+	if (!temp->args || !temp->args[1])
+	{
+		write(1, "\n", 1);
+		return;
+	}
+	while (temp->args[i] && is_valid_n_flag(temp->args[i]))
+	{
 		n_flag = 1;
-	if (n_flag == 1)
-		echo_n_flag(ms, temp);
-	else if (n_flag == 0)
-	{
-		while (temp->args[i])
-		{
-			printf("%s", temp->args[i]);
-			if (temp->args[i+1])
-				printf(" ");
-			else
-				printf("\n");
-			i++;
-		}
+		i++;
 	}
+	echo_cont(temp, i, *ms);
+	if (!n_flag)
+		write(1, "\n", 1);
 }
-
-
-void	echo_n_flag(t_ms **ms, t_cmd *temp)
+void echo_cont(t_cmd *temp, int i, t_ms *ms)
 {
-	int	i;
-	if (!temp->args[2])
-		;
-	else
+	while (temp->args[i])
 	{
-		i = 2;
-		while (temp->args[i])
+		if (ft_strchr(temp->args[i], '$') && !ft_strchr(temp->args[i], '\''))
 		{
-			printf("%s", temp->args[i]);
-			if (temp->args[i+1])
-				printf(" ");
-			i++;
+			int s_flag = 0;
+			ft_valid_expand(&(temp->args[i]), ms, &s_flag);
 		}
-		printf("%%\n");
+		write(1, temp->args[i], ft_strlen(temp->args[i]));
+		if (temp->args[i + 1])
+			write(1, " ", 1);
+		i++;
 	}
 }
 
-void	do_exit(t_ms **ms)
+int is_valid_n_flag(char *arg)
+{
+	int i;
+
+	if (!arg || arg[0] != '-' || arg[1] != 'n')
+		return (0);
+	i = 2;
+	while (arg[i])
+	{
+		if (arg[i] != 'n')
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
+void redir_for_builtin(t_ms **ms)
+{
+	t_cmd *temp;
+	temp = (*ms)->cmd;
+
+	if (temp->fd_out != STDOUT_FILENO)
+		dup2(temp->fd_out, STDOUT_FILENO);
+	if (temp->fd_in != STDIN_FILENO)
+		dup2(temp->fd_in, STDIN_FILENO);
+}
+
+void do_exit(t_ms **ms)
 {
 	(*ms)->exit_code = 1;
 	ft_write_to_fd(STDERR_FILENO, "exit");
@@ -699,17 +676,21 @@ void	do_exit(t_ms **ms)
 			(*ms)->exit_code = 255;
 			ft_write_to_fd(STDERR_FILENO, "numeric argument required");
 		}
-		else 
-			(*ms)->exit_code =  ft_atoi((*ms)->cmd->args[1]);
+		else
+			(*ms)->exit_code = ft_atoi((*ms)->cmd->args[1]);
 	}
 	else
 		(*ms)->exit_code = 0;
 	exit((*ms)->exit_code);
+	    free_commands((*ms)->cmd);
+    cleanup_env((*ms)->env_s);
+    clear_history();
+    rl_clear_history();
 }
 
-int	ft_is_num(char	*string)
+int ft_is_num(char *string)
 {
-	int	i;
+	int i;
 
 	i = 0;
 	while (string[i])
@@ -721,9 +702,9 @@ int	ft_is_num(char	*string)
 	return (1);
 }
 
-void	ft_write_to_fd(int fd, char *string)
+void ft_write_to_fd(int fd, char *string)
 {
-	int	i;
+	int i;
 
 	i = 0;
 	while (string[i])
@@ -731,10 +712,10 @@ void	ft_write_to_fd(int fd, char *string)
 	write(fd, "\n", 1);
 }
 
-void	token_writter(t_ms **ms)
+void token_writter(t_ms **ms)
 {
 	t_token *temp;
-	
+
 	temp = (*ms)->token;
 	while (temp)
 	{
@@ -743,9 +724,9 @@ void	token_writter(t_ms **ms)
 	}
 }
 
-void	all_path_joiner(t_ms **ms, t_cmd **cmd)
+void all_path_joiner(t_ms **ms, t_cmd **cmd)
 {
-	t_ms	*temp;
+	t_ms *temp;
 
 	temp = (*ms);
 	while (temp->env_s)
@@ -757,18 +738,17 @@ void	all_path_joiner(t_ms **ms, t_cmd **cmd)
 	(*cmd)->path_for_excat = ft_split(temp->env_s->env_value, ':');
 }
 
-
-void	execution(t_ms *ms)
+void execution(t_ms *ms)
 {
-	int	count_command;
-	int	status;
+	int count_command;
+	int status;
 
-	count_command = ft_command_counter(&(ms->cmd)); 
+	count_command = ft_command_counter(&(ms->cmd));
 	if (strcmp(ms->cmd->args[0], "exit") == 0)
 		do_exit(&ms);
-	if (count_command == 1) 
+	if (count_command == 1)
 	{
-		if (ft_is_builtin(&(ms)->cmd)!= 10)
+		if (ft_is_builtin(&(ms)->cmd) != 10)
 			do_builtin(&ms, &(ms->cmd));
 		else
 		{
@@ -790,7 +770,7 @@ void	execution(t_ms *ms)
 		multi_exec(&ms, count_command);
 }
 
-void	free_cmd(t_cmd **cmd)
+void free_cmd(t_cmd **cmd)
 {
 	t_cmd *temp;
 
@@ -805,11 +785,11 @@ void	free_cmd(t_cmd **cmd)
 	}
 }
 
-void	arg_join(t_cmd **cmd)
+void arg_join(t_cmd **cmd)
 {
-	int		i;
-	char	*temp;
-	t_cmd	*temp2;
+	int i;
+	char *temp;
+	t_cmd *temp2;
 
 	temp2 = (*cmd);
 	i = 0;
@@ -827,10 +807,10 @@ void	arg_join(t_cmd **cmd)
 
 void exec_for_multi(t_ms **ms, t_cmd **cmd)
 {
-	int	i;
+	int i;
 	t_cmd *temp;
 
-	int	j = 0;
+	int j = 0;
 	temp = (*cmd);
 	if (ft_is_builtin(cmd) != 10)
 		do_builtin(ms, cmd);
@@ -852,7 +832,7 @@ void exec_for_multi(t_ms **ms, t_cmd **cmd)
 	}
 	else
 	{
-		all_path_joiner (ms, cmd);
+		all_path_joiner(ms, cmd);
 		arg_join(cmd);
 		find_exact_path(ms, cmd, &i);
 		execve(temp->path_for_excat[i], temp->args, (*ms)->env);
@@ -862,10 +842,10 @@ void exec_for_multi(t_ms **ms, t_cmd **cmd)
 
 void one_exec(t_ms **ms, t_cmd **cmd)
 {
-	int	i;
+	int i;
 	t_cmd *temp;
 
-	int	j = 0;
+	int j = 0;
 	temp = (*cmd);
 
 	dup2((*cmd)->fd_in, STDIN_FILENO);
@@ -890,7 +870,7 @@ void one_exec(t_ms **ms, t_cmd **cmd)
 	}
 	else
 	{
-		all_path_joiner (ms, cmd);
+		all_path_joiner(ms, cmd);
 		arg_join(cmd);
 		find_exact_path(ms, cmd, &i);
 		execve(temp->path_for_excat[i], temp->args, (*ms)->env);
@@ -899,9 +879,9 @@ void one_exec(t_ms **ms, t_cmd **cmd)
 	}
 }
 
-static void	init_pipes(t_pipe_data *data)
+static void init_pipes(t_pipe_data *data)
 {
-	int	i;
+	int i;
 
 	i = 0;
 	while (i < data->cmd_count - 1)
@@ -912,9 +892,9 @@ static void	init_pipes(t_pipe_data *data)
 	}
 }
 
-static void	close_pipe_fds(t_pipe_data *data)
+static void close_pipe_fds(t_pipe_data *data)
 {
-	int	i;
+	int i;
 
 	i = 0;
 	while (i < data->cmd_count - 1)
@@ -925,10 +905,10 @@ static void	close_pipe_fds(t_pipe_data *data)
 	}
 }
 
-static void	wait_for_children(t_ms **ms, t_pipe_data *data)
+static void wait_for_children(t_ms **ms, t_pipe_data *data)
 {
-	int	i;
-	int	status;
+	int i;
+	int status;
 
 	i = 0;
 	while (i < data->cmd_count)
@@ -939,18 +919,18 @@ static void	wait_for_children(t_ms **ms, t_pipe_data *data)
 	}
 }
 
-void	multi_exec(t_ms **ms, int cmd_count)
+void multi_exec(t_ms **ms, int cmd_count)
 {
-	t_pipe_data	data;
-	t_cmd		*cmd;
-	int			fds[cmd_count - 1][2];
+	t_pipe_data data;
+	t_cmd *cmd;
+	int fds[cmd_count - 1][2];
 
 	data.fds = fds;
 	data.cmd_count = cmd_count;
 	data.pids = (pid_t *)malloc(cmd_count * sizeof(pid_t));
 	data.cmd_index = 0;
 	if (!data.pids)
-		return ;
+		return;
 	init_pipes(&data);
 	cmd = (*ms)->cmd;
 	while (cmd)
@@ -964,7 +944,7 @@ void	multi_exec(t_ms **ms, int cmd_count)
 	free(data.pids);
 }
 
-static void	handle_first_cmd(t_cmd *cmd, t_pipe_data *data)
+static void handle_first_cmd(t_cmd *cmd, t_pipe_data *data)
 {
 	cl_fds_first(data->fds, data->cmd_count);
 	dup2(data->fds[0][1], STDOUT_FILENO);
@@ -972,7 +952,7 @@ static void	handle_first_cmd(t_cmd *cmd, t_pipe_data *data)
 	close(data->fds[0][1]);
 }
 
-static void	handle_last_cmd(t_cmd *cmd, t_pipe_data *data)
+static void handle_last_cmd(t_cmd *cmd, t_pipe_data *data)
 {
 	cl_fds_last(data->fds, data->cmd_count);
 	dup2(data->fds[data->cmd_count - 2][0], STDIN_FILENO);
@@ -981,7 +961,7 @@ static void	handle_last_cmd(t_cmd *cmd, t_pipe_data *data)
 	close(data->fds[data->cmd_count - 2][0]);
 }
 
-static void	handle_middle_cmd(t_cmd *cmd, t_pipe_data *data)
+static void handle_middle_cmd(t_cmd *cmd, t_pipe_data *data)
 {
 	cl_fds_middle(data->fds, data->cmd_count, data->cmd_index);
 	dup2(data->fds[data->cmd_index - 1][0], STDIN_FILENO);
@@ -992,7 +972,7 @@ static void	handle_middle_cmd(t_cmd *cmd, t_pipe_data *data)
 	close(data->fds[data->cmd_index][1]);
 }
 
-void	multi_exec_cont(t_ms **ms, t_cmd *cmd, t_pipe_data *data)
+void multi_exec_cont(t_ms **ms, t_cmd *cmd, t_pipe_data *data)
 {
 	data->pids[data->cmd_index] = fork();
 	if (data->pids[data->cmd_index] == -1)
@@ -1010,10 +990,10 @@ void	multi_exec_cont(t_ms **ms, t_cmd *cmd, t_pipe_data *data)
 	}
 }
 
-void	cl_fds_first(int (*fds)[2], int cmd_count)
+void cl_fds_first(int (*fds)[2], int cmd_count)
 {
-	int	i;
-	int	j;
+	int i;
+	int j;
 
 	i = 0;
 	close(fds[0][0]);
@@ -1030,10 +1010,10 @@ void	cl_fds_first(int (*fds)[2], int cmd_count)
 	}
 }
 
-void	cl_fds_last(int (*fds)[2], int cmd_count)
+void cl_fds_last(int (*fds)[2], int cmd_count)
 {
-	int	i;
-	int	j;
+	int i;
+	int j;
 
 	i = 0;
 	while (i < cmd_count - 1)
@@ -1050,9 +1030,9 @@ void	cl_fds_last(int (*fds)[2], int cmd_count)
 	close(fds[cmd_count - 2][1]);
 }
 
-void	cl_fds_middle(int (*fds)[2], int cmd_count, int index)
+void cl_fds_middle(int (*fds)[2], int cmd_count, int index)
 {
-	int	i;
+	int i;
 
 	i = 0;
 	while (i < cmd_count - 1)
@@ -1065,61 +1045,38 @@ void	cl_fds_middle(int (*fds)[2], int cmd_count, int index)
 	}
 }
 
-
-
 void ft_set_env(char *name, char *value, int overwrite, t_env *env_s)
 {
-  t_env *tmp;
-  char *new_value;
+	t_env *tmp;
+	char *new_value;
 
-  tmp = env_s;
-  while (tmp) {
-    if (ft_strncmp(tmp->env_name, name, ft_strlen(name)) == 0) {
-      if (overwrite == 1) {
-        new_value = ft_strdup(value);
-        free(tmp->env_value);
-        tmp->env_value = new_value;
-      }
-      return;
-    }
-    tmp = tmp->next;
-  }
-  ft_set_node(&tmp, name, value);
-  env_s = tmp;
-}
-
-int ft_isspace(int c) {
-	return (c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f' ||
-		c == '\r');
-}
-
-
-void	args_writter(t_cmd *cmd)
-{
-	int	i = 0;
-	int	j = 0;
-	if (cmd -> next == NULL)
+	tmp = env_s;
+	while (tmp)
 	{
-		for (int i = 0; cmd->args[i]; i++)
-			printf("args[%d] is %s\n",i, cmd->args[i]);
-	}
-	else
-	{
-		while (cmd)
+		if (ft_strncmp(tmp->env_name, name, ft_strlen(name)) == 0)
 		{
-			i = 0;
-			while (cmd->args[i])
+			if (overwrite == 1)
 			{
-				printf(" %d. args[%d] = %s\n",j, i, cmd->args[i]);
-				i++;
+				new_value = ft_strdup(value);
+				free(tmp->env_value);
+				tmp->env_value = new_value;
 			}
-			j++;
-			cmd = cmd->next;
+			return;
 		}
+		tmp = tmp->next;
 	}
+	ft_set_node(&tmp, name, value);
+	env_s = tmp;
 }
 
-void	ft_env_checker(t_env **env)
+int ft_isspace(int c)
+{
+	return (c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f' ||
+			c == '\r');
+}
+
+
+void ft_env_checker(t_env **env)
 {
 	t_env *temp;
 	temp = (*env);
@@ -1131,21 +1088,36 @@ void	ft_env_checker(t_env **env)
 	}
 }
 
-void	ft_env_double_checker(char	**string)
+void ft_env_double_checker(char **string)
 {
 	int i = 0;
 	while (string[i])
 	{
-		printf("string[%d] = %s\n",i, string[i]);
+		printf("string[%d] = %s\n", i, string[i]);
 		i++;
 	}
 }
 
+void cleanup_env(t_env *env_s)
+{
+    t_env *current;
+    t_env *next;
 
+    current = env_s;
+    while (current)
+    {
+        next = current->next;
+        if (current->env_name)
+            free(current->env_name);
+        if (current->env_value)
+            free(current->env_value);
+        free(current);
+        current = next;
+    }
+}
 
 int main(int argc, char **argv, char **envp)
 {
-	atexit(&leaks);
 	t_ms ms;
 	t_env *env_s;
 
@@ -1161,5 +1133,8 @@ int main(int argc, char **argv, char **envp)
 	while (1) // burdan sonrasi ayni
 		if (!process(&ms))
 			break;
-	return (clear_history(), (void)argv, (void)argc, 0);
+	clear_history();
+	rl_clear_history();
+	cleanup_env(env_s);
+	return ((void)argv, (void)argc, 0);
 }

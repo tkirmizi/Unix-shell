@@ -6,7 +6,7 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 13:41:09 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/12 10:49:35 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/13 12:26:13 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -401,7 +401,7 @@ int process_dbl_quotes(char *str, int *i, char **ex_str, t_ms *ms)
 	{
 		if (str[*i] == '$' && str[*i + 1] && str[*i + 1] != '\"' && str[*i + 1] != ' ')
 		{
-			process_var_expasion(str, i, ex_str, ms);
+			process_var_expasion_first(str, i, ex_str, ms);
 			(*i)--;
 		}
 		else
@@ -416,25 +416,31 @@ int process_dbl_quotes(char *str, int *i, char **ex_str, t_ms *ms)
 int process_single_qutoes(char *str, int *i, char **ex_str)
 {
 	int start;
-	int end;
 
 	(*i)++;
 	start = *i;
-	end = ft_strlen(str);
-
 	while (str[*i] && str[*i] != '\'')
 		(*i)++;
-
 	*ex_str = ft_strnjoin(*ex_str, &str[start], *i - start);
-
-	if (*i < end)
+	if (str[*i] == '\'')
 		(*i)++;
-
 	return (1);
 }
 
-int process_var_expasion(char *str, int *i, char **ex_str, t_ms *ms)
+int process_var_expasion_first(char *str, int *i, char **ex_str, t_ms *ms)
 {
+	if (*i < (int)ft_strlen(str))
+		(*i)++;
+	if (str[*i] == '$' || str[*i] == '?')
+		return (process_pid_exit(str, i, ex_str, ms));
+	ft_exp_concan(str, i, ex_str, ms);
+	return (1);
+}
+
+int process_var_expasion_second(char *str, int *i, char **ex_str, t_ms *ms, int **s_flag)
+{
+	**s_flag = 1;
+
 	if (*i < (int)ft_strlen(str))
 		(*i)++;
 	if (str[*i] == '$' || str[*i] == '?')
@@ -488,31 +494,30 @@ void subtitute_free_args(char ***args, int *n, int *s_flag)
 	*args = new_args;
 }
 
-char *str_expander(char *expanded_str, char *str, int *s_flag, t_ms *ms)
+char *str_expander(char *expanded_str, char *str, int *s_flag, t_ms *ms, int len)
 {
 	int i;
-	int len;
 
-	i = 0;
-	len = ft_strlen(str);
-	while (i < len)
+	i = -1;
+	while (++i < len)
 	{
 		if (str[i] == '\'' || str[i] == '\"' || str[i] == '$')
 		{
 			if (str[i] == '\'')
-				process_single_qutoes(str, &i, &expanded_str);
-			else if (str[i] == '\"')
-				process_dbl_quotes(str, &i, &expanded_str, ms);
-			else if (str[i] == '$')
 			{
-				*s_flag = 1;
-				process_var_expasion(str, &i, &expanded_str, ms);
+				process_single_qutoes(str, &i, &expanded_str);
+				continue;
 			}
-			i--;
+			else if (str[i] == '\"')
+			{
+				process_dbl_quotes(str, &i, &expanded_str, ms);
+				continue;
+			}
+			else if (str[i] == '$')
+				process_var_expasion_second(str, &i, &expanded_str, ms, &s_flag);
 		}
 		else
 			expanded_str = ft_strnjoin(expanded_str, &str[i], 1);
-		i++;
 	}
 	return (expanded_str);
 }
@@ -524,7 +529,7 @@ int ft_valid_expand(char **s, t_ms *ms, int *s_flag)
 
 	str = *s;
 	expanded_str = NULL;
-	expanded_str = str_expander(expanded_str, str, s_flag, ms);
+	expanded_str = str_expander(expanded_str, str, s_flag, ms, ft_strlen(str));
 	if (expanded_str)
 	{
 		free(*s);
@@ -1125,6 +1130,35 @@ t_token *ft_word_token(t_lex *lex)
 	return (ft_ext_word_val(start, lex));
 }
 
+char *clean_quotes(char *str)
+{
+	char *cleaned;
+	int i = 0, j = 0;
+	int in_squote = 0, in_dquote = 0;
+
+	if (!str)
+		return NULL;
+	cleaned = malloc(strlen(str) + 1);
+	if (!cleaned)
+	{
+		free(str);
+		return NULL;
+	}
+	while (str[i])
+	{
+		if (str[i] == '\'' && !in_dquote)
+			in_squote = !in_squote;
+		else if (str[i] == '\"' && !in_squote)
+			in_dquote = !in_dquote;
+		else
+			cleaned[j++] = str[i];
+		i++;
+	}
+	cleaned[j] = '\0';
+	free(str);
+	return cleaned;
+}
+
 char *ft_strnjoin(char *s1, const char *s2, size_t n)
 {
 	char *str;
@@ -1168,7 +1202,6 @@ t_env_var *create_env_var(const char *name, const char *value)
 		free(var);
 		return (NULL);
 	}
-
 	var->name_len = ft_strlen(name);
 	var->value_len = ft_strlen(value);
 	return (var);
@@ -1301,23 +1334,29 @@ int handle_split(t_cmd *cmd, char **split, int i, int original_count)
 	free(cmd->args[i]);
 	cmd->args[i] = ft_strdup(split[0]);
 	if (split_count > 1)
-	{
-		j = original_count - 1;
-		shift = split_count - 1;
-		while (j > i)
-		{
-			cmd->args[j + shift] = cmd->args[j];
-			j--;
-		}
-		j = 1;
-		while (j < split_count)
-		{
-			cmd->args[i + j] = ft_strdup(split[j]);
-			j++;
-		}
-		cmd->args[original_count + shift] = NULL;
-	}
+		handle_split_cont(&cmd, split, &i, &original_count, &split_count);
 	return (split_count);
+}
+
+void	handle_split_cont(t_cmd **cmd, char **split, int *i, int *original_count, int *split_count)
+{
+	int shift;
+	int	j;
+
+	j = (*original_count) - 1;
+	shift = (*split_count) - 1;
+	while (j > (*i))
+	{
+		(*cmd)->args[j + shift] = (*cmd)->args[j];
+		j--;
+	}
+	j = 1;
+	while (j < (*split_count))
+	{
+		(*cmd)->args[(*i) + j] = ft_strdup(split[j]);
+		j++;
+	}
+	(*cmd)->args[(*original_count) + shift] = NULL;
 }
 
 int handle_expanded(t_cmd *cmd, char *expanded, int i, t_expansion *exp)
@@ -1345,9 +1384,13 @@ int handle_expanded(t_cmd *cmd, char *expanded, int i, t_expansion *exp)
 			return (-1);
 		return (split_count - 1);
 	}
-	free(cmd->args[i]);
-	cmd->args[i] = expanded;
+	handle_explanded_sec(&cmd, &expanded, &i, &exp);
 	return (0);
+}
+void handle_explanded_sec(t_cmd **cmd, char **expanded, int *i, t_expansion **exp)
+{
+	free((*cmd)->args[*i]);
+	(*cmd)->args[*i] = (*expanded);
 }
 
 void reset_expansion(t_expansion *exp)
@@ -1665,29 +1708,93 @@ char *handle_dollar(char *str, size_t *i, t_expansion *exp, char **result)
 	return (*result);
 }
 
+char *handle_single_quotes(char *str, size_t *i, char *result, t_expansion *exp)
+{
+	char *temp;
+
+	exp->in_squote = !exp->in_squote;
+	(*i)++;
+	while (str[*i] && str[*i] != '\'')
+	{
+		temp = ft_strnjoin(result, &str[*i], 1);
+		if (!temp)
+			return (NULL);
+		result = temp;
+		(*i)++;
+	}
+	if (str[*i] == '\'')
+	{
+		exp->in_squote = !exp->in_squote;
+		(*i)++;
+	}
+	return (result);
+}
+
+char *handle_double_quotes(char *str, size_t *i, char *result, t_expansion *exp)
+{
+	char *temp;
+
+	exp->in_dquote = !exp->in_dquote;
+	(*i)++;
+	while (str[*i] && str[*i] != '\"')
+	{
+		if (str[*i] == '$' && str[*i + 1])
+		{
+			result = handle_dollar(str, i, exp, &result);
+			if (!result)
+				return (NULL);
+		}
+		else
+		{
+			temp = ft_strnjoin(result, &str[*i], 1);
+			if (!temp)
+				return (NULL);
+			result = temp;
+			(*i)++;
+		}
+	}
+	if (str[*i] == '\"')
+		handle_double_q_cont(str, i, result, exp);
+	return (result);
+}
+
+void	handle_double_q_cont(char *str, size_t *i, char *result, t_expansion *exp)
+{
+	exp->in_dquote = !exp->in_dquote;
+	(*i)++;
+}
+
+char *handle_regular_char(char *str, size_t *i, char *result)
+{
+	char *temp;
+
+	temp = ft_strnjoin(result, &str[*i], 1);
+	if (!temp)
+		return (NULL);
+	(*i)++;
+	return (temp);
+}
+
 char *expand_variables(char *str, t_expansion *exp)
 {
 	char *result;
 	size_t i;
-	char *temp;
 
 	result = NULL;
 	i = 0;
 	while (str && str[i])
 	{
-		if (str[i] == '$' && str[i + 1])
-		{
-			if (!handle_dollar(str, &i, exp, &result))
-				return (NULL);
-		}
+		if (str[i] == '\'')
+			result = handle_single_quotes(str, &i, result, exp);
+		else if (str[i] == '\"')
+			result = handle_double_quotes(str, &i, result, exp);
+		else if (str[i] == '$' && str[i + 1])
+			result = handle_dollar(str, &i, exp, &result);
 		else
-		{
-			temp = ft_strnjoin(result, &str[i], 1);
-			if (!temp)
-				return (NULL);
-			result = temp;
-			i++;
-		}
+			result = handle_regular_char(str, &i, result);
+
+		if (!result)
+			return (NULL);
 	}
 	return (result);
 }
