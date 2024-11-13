@@ -6,7 +6,7 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 15:28:50 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/13 12:57:25 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/13 13:56:06 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,7 +174,6 @@ void		subtitute_free_args(char ***args, int *n, int *s_flag);
 void		ft_eval_args(t_cmd *cmd, t_ms *ms);
 void		ft_env_checker(t_env **env);
 void		ft_env_double_checker(char **string);
-void		args_writter(t_cmd *cmd);
 void		exec_for_multi(t_ms **ms, t_cmd **cmd);
 void		find_exact_path(t_ms **ms, t_cmd **cmd, int *i);
 void		arg_join(t_cmd **cmd);
@@ -218,6 +217,15 @@ void		handle_explanded_sec(t_cmd **cmd, char **expanded, int *i, t_expansion **e
 void		echo_cont(t_cmd *temp, int i, t_ms *ms);
 void remove_args(t_cmd *cmd);
 void set_fd_helper(char *re, char *path, t_cmd *cmd);
+void	one_exec_cont_sec(t_ms **ms, t_cmd **cmd, t_cmd **temp, int	*i);
+void	exec_for_else(t_ms *ms, int status);
+void init_pipes(t_pipe_data *data);
+void close_pipe_fds(t_pipe_data *data);
+void wait_for_children(t_ms **ms, t_pipe_data *data);
+void handle_first_cmd(t_cmd *cmd, t_pipe_data *data);
+void handle_last_cmd(t_cmd *cmd, t_pipe_data *data);
+void handle_middle_cmd(t_cmd *cmd, t_pipe_data *data);
+void fill_array(t_ms **ms, t_env *temp, int i);
 
 int			handle_quote(char *str, t_expansion *exp, char quote_type);
 int			count_words(char *str);
@@ -270,6 +278,7 @@ int			fill_word(char **words, char *str, int *i, int word_count);
 int			is_valid_n_flag(char *arg);
 int pipe_error_check(t_token *token);
 int redir_error_check(t_token *token);
+int wrong_input(char *input);
 
 char		*ft_strnjoin(char *s1, const char *s2, size_t n);
 char		*ft_fetch_env(const char *name, char **env);

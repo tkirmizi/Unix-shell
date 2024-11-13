@@ -31,6 +31,22 @@ SRCS = minishell.c \
 		parsing/token_manage.c \
 		parsing/token_type.c \
 		parsing/utils.c \
+		execution/builtin_core.c \
+		execution/cd_pwd_utils.c \
+		execution/cd_pwd.c \
+		execution/echo.c \
+		execution/env_handle.c \
+		execution/exec_cont.c \
+		execution/execution.c \
+		execution/export.c \
+		execution/fds_handle.c \
+		execution/main.c \
+		execution/mem_utils.c \
+		execution/other_bin.c \
+		execution/path_man.c \
+		execution/pipe_handle.c \
+		execution/some_utils.c \
+		execution/unset_bin.c \
 
 
 OBJS = $(SRCS:.c=.o)
