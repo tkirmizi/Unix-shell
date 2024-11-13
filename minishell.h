@@ -6,7 +6,7 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 15:28:50 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/13 12:16:37 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/13 12:57:25 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,6 +146,8 @@ t_token		*ft_ext_word_val(int start, t_lex *lex);
 t_token		*open_quote_val(void);
 t_token		*cr_empty_q_t(void);
 t_expansion	*init_expansion(void);
+t_lex *lexer_init(t_ms *ms);
+t_token *get_token(t_lex *lexer);
 
 void		destroy_env_var(t_env_var *var);
 void		print_commands(t_cmd *cmd);
@@ -214,6 +216,8 @@ void		handle_double_q_cont(char *str, size_t *i, char *result, t_expansion *exp)
 void		handle_split_cont(t_cmd **cmd, char **split, int *i, int *original_count, int *split_count);
 void		handle_explanded_sec(t_cmd **cmd, char **expanded, int *i, t_expansion **exp);
 void		echo_cont(t_cmd *temp, int i, t_ms *ms);
+void remove_args(t_cmd *cmd);
+void set_fd_helper(char *re, char *path, t_cmd *cmd);
 
 int			handle_quote(char *str, t_expansion *exp, char quote_type);
 int			count_words(char *str);
@@ -264,6 +268,8 @@ int			handle_quote(char *str, t_expansion *exp, char quote_type);
 int			handle_quote_cont(char *str, t_expansion *exp, char quote_type, size_t start);
 int			fill_word(char **words, char *str, int *i, int word_count);
 int			is_valid_n_flag(char *arg);
+int pipe_error_check(t_token *token);
+int redir_error_check(t_token *token);
 
 char		*ft_strnjoin(char *s1, const char *s2, size_t n);
 char		*ft_fetch_env(const char *name, char **env);
@@ -276,6 +282,7 @@ char		*cur_pwd_return(t_ms **ms);
 char		*copy_token_value(t_token *token);
 char		**ft_generate_args(char **new_args, char **args, char **splt_args,
 				const int *n);
+char *handle_single_quotes(char *str, size_t *i, char *result, t_expansion *exp);
 char		**ft_realloc_array(char **ptr, size_t new_size);
 char		**ft_realloc_array(char **ptr, size_t new_size);
 char		**split_expanded(char *str);
@@ -288,5 +295,9 @@ char *str_expander(char *expanded_str, char *str, int *s_flag, t_ms *ms, int len
 char		*handle_env_var(char *str, size_t *i, char **result);
 char		*handle_dollar(char *str, size_t *i, t_expansion *exp, char **result);
 char		*clean_quotes(char *str);
+char *handle_double_quotes(char *str, size_t *i, char *result, t_expansion *exp);
+char *handle_regular_char(char *str, size_t *i, char *result);
+char **allocate_new_args(char **args, const char *temp, char **split_args,
+						 int *n);
 
 #endif

@@ -9,7 +9,29 @@ LIBFT_DIR = libft
 
 SRCS = minishell.c \
 		signal_handler.c \
-		lex.c \
+		parsing/arg_process.c \
+		parsing/command_display.c \
+		parsing/command_struct.c \
+		parsing/env_var.c \
+		parsing/error.c \
+		parsing/exp_handle_cont.c \
+		parsing/exp_handle.c \
+		parsing/heredoc.c \
+		parsing/lex_init.c \
+		parsing/mem_manage.c \
+		parsing/node_manage.c \
+		parsing/other_utils.c \
+		parsing/parse.c \
+		parsing/process_var.c \
+		parsing/quote_handle.c \
+		parsing/quote.c \
+		parsing/redir.c \
+		parsing/split_handle.c \
+		parsing/split.c \
+		parsing/token_manage.c \
+		parsing/token_type.c \
+		parsing/utils.c \
+
 
 OBJS = $(SRCS:.c=.o)
 
