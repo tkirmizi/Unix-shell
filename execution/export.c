@@ -6,16 +6,16 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 13:46:50 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/13 13:47:26 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/14 19:23:53 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-void do_export(t_ms **ms)
+void	do_export(t_ms **ms)
 {
-	int i;
-	t_ms *temp;
+	int		i;
+	t_ms	*temp;
 
 	(*ms)->exit_code = 1;
 	temp = (*ms);
@@ -36,7 +36,8 @@ void do_export(t_ms **ms)
 	(*ms)->exit_code = 0;
 }
 
-void export_itself_cont(t_env *temp, char *before_eq, char *after_eq, int before_len)
+void	export_itself_cont(t_env *temp, char *before_eq, char *after_eq,
+		int before_len)
 {
 	while (temp->next != NULL)
 	{
@@ -44,7 +45,7 @@ void export_itself_cont(t_env *temp, char *before_eq, char *after_eq, int before
 		{
 			free(temp->env_value);
 			temp->env_value = ft_strdup(after_eq + 1);
-			return;
+			return ;
 		}
 		temp = temp->next;
 	}
@@ -54,12 +55,12 @@ void export_itself_cont(t_env *temp, char *before_eq, char *after_eq, int before
 	temp->next->next = NULL;
 }
 
-void export_itself(t_ms **ms, char *string)
+void	export_itself(t_ms **ms, char *string)
 {
-	t_env *temp;
-	char *before_eq;
-	char *after_eq;
-	int before_len;
+	t_env	*temp;
+	char	*before_eq;
+	char	*after_eq;
+	int		before_len;
 
 	temp = (*ms)->env_s;
 	after_eq = ft_strnstr(string, "=", ft_strlen(string));
@@ -79,7 +80,7 @@ void export_itself(t_ms **ms, char *string)
 	export_itself_cont(temp, before_eq, after_eq, before_len);
 }
 
-static void check_exp_exist_cont(t_env *temp, char *before_eq, int before_len)
+static void	check_exp_exist_cont(t_env *temp, char *before_eq, int before_len)
 {
 	while (temp)
 	{
@@ -92,12 +93,12 @@ static void check_exp_exist_cont(t_env *temp, char *before_eq, int before_len)
 	}
 }
 
-void check_export_exist(t_ms **ms, char *string)
+void	check_export_exist(t_ms **ms, char *string)
 {
-	t_env *temp;
-	char *before_eq;
-	char *after_eq;
-	int before_len;
+	t_env	*temp;
+	char	*before_eq;
+	char	*after_eq;
+	int		before_len;
 
 	temp = (*ms)->env_s;
 	after_eq = ft_strnstr(string, "=", ft_strlen(string));

@@ -6,13 +6,13 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 12:41:41 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/13 12:42:01 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/13 17:21:59 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-int ft_manage_redir_out(t_ms *mini, t_cmd *cmd, int *i)
+int	ft_manage_redir_out(t_ms *mini, t_cmd *cmd, int *i)
 {
 	if (!cmd->args[*i + 1])
 		return (1);
@@ -27,12 +27,12 @@ int ft_manage_redir_out(t_ms *mini, t_cmd *cmd, int *i)
 	return (1);
 }
 
-int ft_manage_redir_in(t_ms *mini, t_cmd *cmd, int *i)
+int	ft_manage_redir_in(t_ms *mini, t_cmd *cmd, int *i)
 {
 	if (!cmd->args[*i + 1])
 		return (1);
-	if ((!ft_strcmp(cmd->args[*i], "<") || (!ft_strcmp(cmd->args[*i], "<<"))) &&
-		!ft_valid_file(cmd->args[(*i) + 1]))
+	if ((!ft_strcmp(cmd->args[*i], "<") || (!ft_strcmp(cmd->args[*i], "<<")))
+		&& !ft_valid_file(cmd->args[(*i) + 1]))
 	{
 		mini->exit_code = 1;
 		return (0);
@@ -48,9 +48,7 @@ int ft_manage_redir_in(t_ms *mini, t_cmd *cmd, int *i)
 	return (1);
 }
 
-
-
-int ft_manage_redir_helper(t_ms *mini, t_cmd *cmd, int *i)
+int	ft_manage_redir_helper(t_ms *mini, t_cmd *cmd, int *i)
 {
 	if (cmd->args[*i][0] == '<')
 	{
@@ -65,10 +63,10 @@ int ft_manage_redir_helper(t_ms *mini, t_cmd *cmd, int *i)
 	return (1);
 }
 
-int ft_manage_redir(t_ms *mini)
+int	ft_manage_redir(t_ms *mini)
 {
-	t_cmd *temp;
-	int i;
+	t_cmd	*temp;
+	int		i;
 
 	temp = mini->cmd;
 	while (mini->cmd)
@@ -80,7 +78,7 @@ int ft_manage_redir(t_ms *mini)
 			{
 				if (!mini->cmd->next)
 					return (0);
-				break;
+				break ;
 			}
 			i++;
 		}
@@ -90,7 +88,7 @@ int ft_manage_redir(t_ms *mini)
 	return (1);
 }
 
-int set_fd(char *re, char *path, t_cmd *cmd, t_ms *mini)
+int	set_fd(char *re, char *path, t_cmd *cmd, t_ms *mini)
 {
 	set_fd_helper(re, path, cmd);
 	if (!ft_strcmp(re, "<<"))

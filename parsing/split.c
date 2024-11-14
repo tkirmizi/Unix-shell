@@ -6,16 +6,16 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 12:39:30 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/13 12:40:19 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/13 17:21:40 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-char **split_expanded(char *str)
+char	**split_expanded(char *str)
 {
-	char **words;
-	int word_count;
+	char	**words;
+	int		word_count;
 
 	word_count = count_words(str);
 	words = (char **)malloc(sizeof(char *) * (word_count + 1));
@@ -24,10 +24,10 @@ char **split_expanded(char *str)
 	return (split_expanded_cont(str, words));
 }
 
-char **split_expanded_cont(char *str, char **words)
+char	**split_expanded_cont(char *str, char **words)
 {
-	int i;
-	int word_count;
+	int	i;
+	int	word_count;
 
 	i = 0;
 	word_count = 0;
@@ -36,7 +36,7 @@ char **split_expanded_cont(char *str, char **words)
 		while (str[i] && ft_isspace(str[i]))
 			i++;
 		if (!str[i])
-			break;
+			break ;
 		if (!fill_word(words, str, &i, word_count))
 			return (clean_split_fail(words, word_count));
 		word_count++;
@@ -45,10 +45,10 @@ char **split_expanded_cont(char *str, char **words)
 	return (words);
 }
 
-int count_words(char *str)
+int	count_words(char *str)
 {
-	int word_count;
-	int i;
+	int	word_count;
+	int	i;
 
 	word_count = 0;
 	i = 0;
@@ -64,9 +64,9 @@ int count_words(char *str)
 	return (word_count);
 }
 
-int fill_word(char **words, char *str, int *i, int word_count)
+int	fill_word(char **words, char *str, int *i, int word_count)
 {
-	int start;
+	int	start;
 
 	start = *i;
 	while (str[*i] && !ft_isspace(str[*i]))
@@ -77,8 +77,7 @@ int fill_word(char **words, char *str, int *i, int word_count)
 	return (1);
 }
 
-
-char **clean_split_fail(char **words, int word_count)
+char	**clean_split_fail(char **words, int word_count)
 {
 	while (--word_count >= 0)
 		free(words[word_count]);

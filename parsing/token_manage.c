@@ -6,16 +6,16 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 12:25:47 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/13 12:28:49 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/13 17:07:07 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-t_token *get_token(t_lex *lexer)
+t_token	*get_token(t_lex *lexer)
 {
-	int input_len;
-	char current_char;
+	int		input_len;
+	char	current_char;
 
 	input_len = ft_strlen(lexer->input);
 	while (lexer->pos < input_len)
@@ -29,8 +29,8 @@ t_token *get_token(t_lex *lexer)
 			return (ft_input_token(lexer));
 		else if (current_char == '>')
 			return (ft_output_token(lexer));
-		else if ((current_char == '\'' || current_char == '\"') &&
-				 lexer->input[lexer->pos + 1] == current_char)
+		else if ((current_char == '\'' || current_char == '\"')
+			&& lexer->input[lexer->pos + 1] == current_char)
 			return (lexer->pos++, lexer->pos++, cr_empty_q_t());
 		else
 			return (ft_word_token(lexer));
@@ -38,9 +38,9 @@ t_token *get_token(t_lex *lexer)
 	return (ft_endof_t());
 }
 
-void free_tokens(t_token *token)
+void	free_tokens(t_token *token)
 {
-	t_token *temp;
+	t_token	*temp;
 
 	while (token)
 	{
@@ -51,10 +51,10 @@ void free_tokens(t_token *token)
 	}
 }
 
-void display_tokens(t_token *token)
+void	display_tokens(t_token *token)
 {
-	char type_str[12];
-	char *value;
+	char	type_str[12];
+	char	*value;
 
 	while (token)
 	{
@@ -63,16 +63,19 @@ void display_tokens(t_token *token)
 		write(1, "Token Type: ", 12);
 		write(1, type_str, ft_strlen(type_str));
 		write(1, "\nToken Value: ", 13);
-		value = token->value ? token->value : "(null)";
+		if (token->value)
+			value = token->value;
+		else
+			value = "(null)";
 		write(1, value, ft_strlen(value));
 		write(1, "\n", 1);
 		token = token->next;
 	}
 }
 
-char *copy_token_value(t_token *token)
+char	*copy_token_value(t_token *token)
 {
-	char *new_str;
+	char	*new_str;
 
 	new_str = ft_strdup(token->value);
 	if (!new_str)
@@ -83,9 +86,9 @@ char *copy_token_value(t_token *token)
 	return (new_str);
 }
 
-void clean_str_array(char **arr, int limit)
+void	clean_str_array(char **arr, int limit)
 {
-	int idx;
+	int	idx;
 
 	idx = 0;
 	if (limit == -1)

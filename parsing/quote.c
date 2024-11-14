@@ -6,17 +6,16 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 12:38:36 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/13 12:39:23 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/14 21:12:45 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-
-
-char *handle_single_quotes(char *str, size_t *i, char *result, t_expansion *exp)
+char	*handle_single_quotes(char *str, size_t *i, char *result,
+		t_expansion *exp)
 {
-	char *temp;
+	char	*temp;
 
 	exp->in_squote = !exp->in_squote;
 	(*i)++;
@@ -36,9 +35,10 @@ char *handle_single_quotes(char *str, size_t *i, char *result, t_expansion *exp)
 	return (result);
 }
 
-char *handle_double_quotes(char *str, size_t *i, char *result, t_expansion *exp)
+char	*handle_double_quotes(char *str, size_t *i, char *result,
+		t_expansion *exp)
 {
-	char *temp;
+	char	*temp;
 
 	exp->in_dquote = !exp->in_dquote;
 	(*i)++;
@@ -60,19 +60,19 @@ char *handle_double_quotes(char *str, size_t *i, char *result, t_expansion *exp)
 		}
 	}
 	if (str[*i] == '\"')
-		handle_double_q_cont(str, i, result, exp);
+		handle_double_q_cont(i, exp);
 	return (result);
 }
 
-void	handle_double_q_cont(char *str, size_t *i, char *result, t_expansion *exp)
+void	handle_double_q_cont(size_t *i, t_expansion *exp)
 {
 	exp->in_dquote = !exp->in_dquote;
 	(*i)++;
 }
 
-char *handle_regular_char(char *str, size_t *i, char *result)
+char	*handle_regular_char(char *str, size_t *i, char *result)
 {
-	char *temp;
+	char	*temp;
 
 	temp = ft_strnjoin(result, &str[*i], 1);
 	if (!temp)
@@ -81,12 +81,13 @@ char *handle_regular_char(char *str, size_t *i, char *result)
 	return (temp);
 }
 
-int process_dbl_quotes(char *str, int *i, char **ex_str, t_ms *ms)
+int	process_dbl_quotes(char *str, int *i, char **ex_str, t_ms *ms)
 {
 	(*i)++;
 	while (str[*i] && str[*i] != '\"')
 	{
-		if (str[*i] == '$' && str[*i + 1] && str[*i + 1] != '\"' && str[*i + 1] != ' ')
+		if (str[*i] == '$' && str[*i + 1] && str[*i + 1] != '\"' && str[*i
+				+ 1] != ' ')
 		{
 			process_var_expasion_first(str, i, ex_str, ms);
 			(*i)--;

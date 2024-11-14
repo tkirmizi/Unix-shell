@@ -6,13 +6,13 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 13:38:25 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/13 13:58:27 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/14 21:02:16 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-void multi_exec_cont(t_ms **ms, t_cmd *cmd, t_pipe_data *data)
+void	multi_exec_cont(t_ms **ms, t_cmd *cmd, t_pipe_data *data)
 {
 	data->pids[data->cmd_index] = fork();
 	if (data->pids[data->cmd_index] == -1)
@@ -30,9 +30,9 @@ void multi_exec_cont(t_ms **ms, t_cmd *cmd, t_pipe_data *data)
 	}
 }
 
-void init_pipes(t_pipe_data *data)
+void	init_pipes(t_pipe_data *data)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (i < data->cmd_count - 1)
@@ -43,9 +43,9 @@ void init_pipes(t_pipe_data *data)
 	}
 }
 
-void close_pipe_fds(t_pipe_data *data)
+void	close_pipe_fds(t_pipe_data *data)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (i < data->cmd_count - 1)
@@ -56,10 +56,10 @@ void close_pipe_fds(t_pipe_data *data)
 	}
 }
 
-void wait_for_children(t_ms **ms, t_pipe_data *data)
+void	wait_for_children(t_ms **ms, t_pipe_data *data)
 {
-	int i;
-	int status;
+	int	i;
+	int	status;
 
 	i = 0;
 	while (i < data->cmd_count)
@@ -70,18 +70,19 @@ void wait_for_children(t_ms **ms, t_pipe_data *data)
 	}
 }
 
-void multi_exec(t_ms **ms, int cmd_count)
+void	multi_exec(t_ms **ms, int cmd_count)
 {
-	t_pipe_data data;
-	t_cmd *cmd;
-	int fds[cmd_count - 1][2];
+	t_pipe_data	data;
+	t_cmd		*cmd;
+	int			(*fds)[2];
 
+	fds = malloc(sizeof(*fds) * (cmd_count - 1));
 	data.fds = fds;
 	data.cmd_count = cmd_count;
 	data.pids = (pid_t *)malloc(cmd_count * sizeof(pid_t));
 	data.cmd_index = 0;
 	if (!data.pids)
-		return;
+		return ;
 	init_pipes(&data);
 	cmd = (*ms)->cmd;
 	while (cmd)

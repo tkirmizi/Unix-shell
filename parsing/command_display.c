@@ -6,15 +6,15 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 12:33:34 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/13 12:34:04 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/14 19:19:27 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-void display_cmd_content(t_cmd *current)
+void	display_cmd_content(t_cmd *current)
 {
-	int idx;
+	int	idx;
 
 	idx = 0;
 	write(1, "Command Arguments: ", 18);
@@ -30,28 +30,28 @@ void display_cmd_content(t_cmd *current)
 	}
 }
 
-void print_commands(t_cmd *cmd)
+void	print_commands(t_cmd *cmd)
 {
-	t_cmd *current;
+	t_cmd	*current;
 
 	if (!cmd)
 	{
 		write(1, "error: no commands \n", 21);
-		return;
+		return ;
 	}
 	current = cmd;
 	while (current)
 		current = current->next;
 }
 
-void ft_itoa_buf(int n, char *buf)
+void	ft_itoa_buf(int n, char *buf)
 {
-	int len;
-	long num;
-	int i;
+	int		len;
+	long	num;
+	int		i;
 
 	if (!buf)
-		return;
+		return ;
 	num = n;
 	len = get_num_len(num);
 	i = len - 1;

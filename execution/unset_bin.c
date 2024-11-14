@@ -6,17 +6,16 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 13:49:07 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/13 13:49:25 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/14 19:22:10 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-
 #include "../minishell.h"
 
-void do_unset(t_ms **ms)
+void	do_unset(t_ms **ms)
 {
-	t_env *temp;
-	int i;
+	t_env	*temp;
+	int		i;
 
 	(*ms)->exit_code = 1;
 	i = 1;
@@ -28,15 +27,17 @@ void do_unset(t_ms **ms)
 	}
 	(*ms)->exit_code = 0;
 }
-void unset_itself(t_ms **ms, char *string)
+
+void	unset_itself(t_ms **ms, char *string)
 {
-	t_env *temp;
-	t_env *temp2;
+	t_env	*temp;
+	t_env	*temp2;
+
 	temp = (*ms)->env_s;
 	while (temp)
 	{
 		if (!(ft_strncmp(string, temp->env_name, ft_strlen(string))))
-			break;
+			break ;
 		temp2 = temp;
 		temp = temp->next;
 	}
@@ -54,9 +55,11 @@ void unset_itself(t_ms **ms, char *string)
 		update_path(ms);
 	}
 }
-void unset_else(t_ms **ms, t_env *temp, t_env *temp2, char *string)
+
+void	unset_else(t_ms **ms, t_env *temp, t_env *temp2, char *string)
 {
-	if (!(ft_strncmp(temp->env_name, (*ms)->env_s->env_name, ft_strlen(temp->env_name))))
+	if (!(ft_strncmp(temp->env_name, (*ms)->env_s->env_name,
+				ft_strlen(temp->env_name))))
 	{
 		(*ms)->env_s = (*ms)->env_s->next;
 		temp->next = NULL;

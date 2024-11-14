@@ -6,15 +6,15 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 13:51:45 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/13 13:53:06 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/14 19:21:38 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-void free_cmd(t_cmd **cmd)
+void	free_cmd(t_cmd **cmd)
 {
-	t_cmd *temp;
+	t_cmd	*temp;
 
 	temp = (*cmd);
 	while (temp)
@@ -25,10 +25,10 @@ void free_cmd(t_cmd **cmd)
 	}
 }
 
-void free_commands(t_cmd *cmd)
+void	free_commands(t_cmd *cmd)
 {
-	t_cmd *tmp;
-	int i;
+	t_cmd	*tmp;
+	int		i;
 
 	tmp = NULL;
 	while (cmd)
@@ -42,5 +42,3 @@ void free_commands(t_cmd *cmd)
 		cmd = tmp;
 	}
 }
-
-

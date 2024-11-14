@@ -6,16 +6,16 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 12:32:35 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/13 12:33:23 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/14 19:19:45 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-int store_args(t_cmd *cmd, t_token **tok, int size)
+int	store_args(t_cmd *cmd, t_token **tok, int size)
 {
-	int i;
-	char *arg;
+	int		i;
+	char	*arg;
 
 	i = 0;
 	while (i < size)
@@ -37,9 +37,9 @@ int store_args(t_cmd *cmd, t_token **tok, int size)
 	return (1);
 }
 
-int extr_args(t_token **token, t_cmd *cmd)
+int	extr_args(t_token **token, t_cmd *cmd)
 {
-	int arg_count;
+	int	arg_count;
 
 	arg_count = count_cmd_args(*token);
 	if (arg_count == 0)
@@ -55,12 +55,12 @@ int extr_args(t_token **token, t_cmd *cmd)
 	return (1);
 }
 
-char **ft_generate_args(char **new_args, char **args, char **splt_args,
-						const int *n)
+char	**ft_generate_args(char **new_args, char **args, char **splt_args,
+		const int *n)
 {
-	int i;
-	int j;
-	int k;
+	int	i;
+	int	j;
+	int	k;
 
 	i = 0;
 	k = 0;
@@ -80,12 +80,12 @@ char **ft_generate_args(char **new_args, char **args, char **splt_args,
 	return (new_args);
 }
 
-char **allocate_new_args(char **args, const char *temp, char **split_args,
-						 int *n)
+char	**allocate_new_args(char **args, const char *temp, char **split_args,
+		int *n)
 {
-	int i;
-	int j;
-	char **new_args;
+	int		i;
+	int		j;
+	char	**new_args;
 
 	i = 0;
 	while (args[i])
@@ -100,9 +100,9 @@ char **allocate_new_args(char **args, const char *temp, char **split_args,
 	return ((void)temp, new_args);
 }
 
-void remove_args(t_cmd *cmd)
+void	remove_args(t_cmd *cmd)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (cmd->args[i])

@@ -6,16 +6,16 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 12:40:27 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/13 12:41:12 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/14 19:18:52 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-char *ft_fetch_env(const char *name, char **env)
+char	*ft_fetch_env(const char *name, char **env)
 {
-	int name_len;
-	int i;
+	int	name_len;
+	int	i;
 
 	name_len = ft_strlen(name);
 	i = 0;
@@ -30,10 +30,10 @@ char *ft_fetch_env(const char *name, char **env)
 	return (NULL);
 }
 
-t_env *ft_save_env(char **env, t_env *env_struct)
+t_env	*ft_save_env(char **env, t_env *env_struct)
 {
-	char **env_split;
-	int i;
+	char	**env_split;
+	int		i;
 
 	i = 0;
 	while (env[i])
@@ -48,16 +48,16 @@ t_env *ft_save_env(char **env, t_env *env_struct)
 	return (env_struct);
 }
 
-void ft_set_node(t_env **env_s, char *token, char *type)
+void	ft_set_node(t_env **env_s, char *token, char *type)
 {
-	t_env *node;
-	t_env *last_node;
+	t_env	*node;
+	t_env	*last_node;
 
 	if (NULL == env_s)
-		return;
+		return ;
 	node = malloc(sizeof(t_env));
 	if (NULL == node)
-		return (free_struct(env_s), (void)NULL);
+		return (free_struct(env_s), (void) NULL);
 	node->next = NULL;
 	node->env_name = ft_strdup(token);
 	free(token);
@@ -75,14 +75,13 @@ void ft_set_node(t_env **env_s, char *token, char *type)
 	}
 }
 
-t_env_var *create_env_var(const char *name, const char *value)
+t_env_var	*create_env_var(const char *name, const char *value)
 {
-	t_env_var *var;
+	t_env_var	*var;
 
 	var = (t_env_var *)malloc(sizeof(t_env_var));
 	if (!var)
 		return (NULL);
-
 	var->name = ft_strdup(name);
 	var->value = ft_strdup(value);
 	if (!var->name || !var->value)
@@ -97,10 +96,10 @@ t_env_var *create_env_var(const char *name, const char *value)
 	return (var);
 }
 
-void destroy_env_var(t_env_var *var)
+void	destroy_env_var(t_env_var *var)
 {
 	if (!var)
-		return;
+		return ;
 	free(var->name);
 	free(var->value);
 	free(var);

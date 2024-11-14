@@ -6,13 +6,13 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 13:36:12 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/13 13:37:02 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/14 19:23:31 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-int process(t_ms *ms)
+int	process(t_ms *ms)
 {
 	g_signal = 0;
 	ms->input = readline("user@user : ");
@@ -29,10 +29,10 @@ int process(t_ms *ms)
 	return (free_commands(ms->cmd), free(ms->input), 1);
 }
 
-int main(int argc, char **argv, char **envp)
+int	main(int argc, char **argv, char **envp)
 {
-	t_ms ms;
-	t_env *env_s;
+	t_ms	ms;
+	t_env	*env_s;
 
 	signal_handler();
 	env_s = NULL;
@@ -44,13 +44,13 @@ int main(int argc, char **argv, char **envp)
 	rl_bind_key('\t', rl_complete);
 	while (1)
 		if (!process(&ms))
-			break;
+			break ;
 	rl_clear_history();
 	cleanup_env(env_s);
 	return ((void)argv, (void)argc, 0);
 }
 
-int wrong_input(char *input)
+int	wrong_input(char *input)
 {
 	if (!input)
 		return (printf("ERROR! No input"), 0);
@@ -61,9 +61,9 @@ int wrong_input(char *input)
 	return (0);
 }
 
-int not_empty(const char *input)
+int	not_empty(const char *input)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (input[i])
@@ -75,16 +75,16 @@ int not_empty(const char *input)
 	return (0);
 }
 
-void update_shell_lvl(t_ms **ms)
+void	update_shell_lvl(t_ms **ms)
 {
-	t_env *temp;
-	int new_shlvl;
+	t_env	*temp;
+	int		new_shlvl;
 
 	temp = (*ms)->env_s;
 	while (temp)
 	{
 		if (ft_strncmp(temp->env_name, "SHLVL", 5) == 0)
-			break;
+			break ;
 		temp = temp->next;
 	}
 	new_shlvl = ft_atoi(temp->env_value);

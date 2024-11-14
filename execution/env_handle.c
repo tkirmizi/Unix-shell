@@ -6,17 +6,17 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 13:47:37 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/13 13:48:34 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/14 19:28:52 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-void update_path(t_ms **ms)
+void	update_path(t_ms **ms)
 {
-	t_env *temp;
-	int i;
-	char **old_env;
+	t_env	*temp;
+	int		i;
+	char	**old_env;
 
 	i = 0;
 	temp = (*ms)->env_s;
@@ -32,9 +32,9 @@ void update_path(t_ms **ms)
 	fill_array(ms, temp, 0);
 }
 
-void fill_array(t_ms **ms, t_env *temp, int i)
+void	fill_array(t_ms **ms, t_env *temp, int i)
 {
-	char *tmp;
+	char	*tmp;
 
 	while (temp != NULL)
 	{
@@ -50,10 +50,10 @@ void fill_array(t_ms **ms, t_env *temp, int i)
 	}
 }
 
-void cleanup_env(t_env *env_s)
+void	cleanup_env(t_env *env_s)
 {
-	t_env *current;
-	t_env *next;
+	t_env	*current;
+	t_env	*next;
 
 	current = env_s;
 	while (current)
@@ -68,10 +68,10 @@ void cleanup_env(t_env *env_s)
 	}
 }
 
-void ft_set_env(char *name, char *value, int overwrite, t_env *env_s)
+void	ft_set_env(char *name, char *value, int overwrite, t_env *env_s)
 {
-	t_env *tmp;
-	char *new_value;
+	t_env	*tmp;
+	char	*new_value;
 
 	tmp = env_s;
 	while (tmp)
@@ -84,7 +84,7 @@ void ft_set_env(char *name, char *value, int overwrite, t_env *env_s)
 				free(tmp->env_value);
 				tmp->env_value = new_value;
 			}
-			return;
+			return ;
 		}
 		tmp = tmp->next;
 	}

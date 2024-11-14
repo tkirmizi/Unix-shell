@@ -6,13 +6,13 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 15:56:25 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/12 10:49:31 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/14 19:30:55 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void sigint_handler(int sig)
+void	sigint_handler(int sig)
 {
 	printf("\n");
 	rl_on_new_line();
@@ -21,7 +21,7 @@ void sigint_handler(int sig)
 	g_signal = sig;
 }
 
-void sigquit_handler(int sig)
+void	sigquit_handler(int sig)
 {
 	if (g_signal == 0)
 	{
@@ -36,7 +36,7 @@ void sigquit_handler(int sig)
 	}
 }
 
-void sig_eof_handler(int sig)
+void	sig_eof_handler(int sig)
 {
 	if (g_signal == 0)
 	{
@@ -50,10 +50,10 @@ void sig_eof_handler(int sig)
 	}
 }
 
-int handle_termios(void)
+int	handle_termios(void)
 {
-	struct termios term_settings;
-	int ret;
+	struct termios	term_settings;
+	int				ret;
 
 	ret = tcgetattr(STDIN_FILENO, &term_settings);
 	if (ret == -1)
@@ -71,7 +71,7 @@ int handle_termios(void)
 	return (0);
 }
 
-void signal_handler(void)
+void	signal_handler(void)
 {
 	if (handle_termios() != 0)
 	{

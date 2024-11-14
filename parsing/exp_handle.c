@@ -6,17 +6,17 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 12:36:33 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/13 12:52:32 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/14 19:17:32 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-int expand(t_ms *ms)
+int	expand(t_ms *ms)
 {
-	t_cmd *cmd;
-	t_expansion *exp;
-	int result;
+	t_cmd		*cmd;
+	t_expansion	*exp;
+	int			result;
 
 	if (!ms || !ms->cmd)
 		return (0);
@@ -31,7 +31,7 @@ int expand(t_ms *ms)
 		if (!cmd->args)
 		{
 			cmd = cmd->next;
-			continue;
+			continue ;
 		}
 		result = expand_args(cmd, exp);
 		cmd = cmd->next;
@@ -40,11 +40,11 @@ int expand(t_ms *ms)
 	return (result);
 }
 
-int expand_args(t_cmd *cmd, t_expansion *exp)
+int	expand_args(t_cmd *cmd, t_expansion *exp)
 {
-	int i;
-	char *expanded;
-	int split_result;
+	int		i;
+	char	*expanded;
+	int		split_result;
 
 	i = 0;
 	while (cmd->args[i])
@@ -61,10 +61,10 @@ int expand_args(t_cmd *cmd, t_expansion *exp)
 	return (1);
 }
 
-char *expand_variables(char *str, t_expansion *exp)
+char	*expand_variables(char *str, t_expansion *exp)
 {
-	char *result;
-	size_t i;
+	char	*result;
+	size_t	i;
 
 	result = NULL;
 	i = 0;
@@ -78,14 +78,13 @@ char *expand_variables(char *str, t_expansion *exp)
 			result = handle_dollar(str, &i, exp, &result);
 		else
 			result = handle_regular_char(str, &i, result);
-
 		if (!result)
 			return (NULL);
 	}
 	return (result);
 }
 
-void reset_expansion(t_expansion *exp)
+void	reset_expansion(t_expansion *exp)
 {
 	exp->result = NULL;
 	exp->pos = 0;
@@ -93,14 +92,13 @@ void reset_expansion(t_expansion *exp)
 	exp->in_dquote = 0;
 }
 
-t_expansion *init_expansion(void)
+t_expansion	*init_expansion(void)
 {
-	t_expansion *exp;
+	t_expansion	*exp;
 
 	exp = (t_expansion *)malloc(sizeof(t_expansion));
 	if (!exp)
 		return (NULL);
-
 	exp->result = NULL;
 	exp->pos = 0;
 	exp->len = 0;

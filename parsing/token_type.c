@@ -6,15 +6,15 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 12:29:13 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/13 12:58:37 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/13 17:03:05 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-t_token *ft_create_pipe_t(t_lex *lexer)
+t_token	*ft_create_pipe_t(t_lex *lexer)
 {
-	t_token *token;
+	t_token	*token;
 
 	token = (t_token *)malloc(sizeof(t_token));
 	if (!token)
@@ -24,9 +24,9 @@ t_token *ft_create_pipe_t(t_lex *lexer)
 	return (lexer->pos++, token);
 }
 
-t_token *ft_input_token(t_lex *lexer)
+t_token	*ft_input_token(t_lex *lexer)
 {
-	t_token *token;
+	t_token	*token;
 
 	token = (t_token *)malloc(sizeof(t_token));
 	if (!token)
@@ -45,9 +45,9 @@ t_token *ft_input_token(t_lex *lexer)
 	}
 }
 
-t_token *ft_output_token(t_lex *lexer)
+t_token	*ft_output_token(t_lex *lexer)
 {
-	t_token *token;
+	t_token	*token;
 
 	token = (t_token *)malloc(sizeof(t_token));
 	if (!token)
@@ -66,19 +66,19 @@ t_token *ft_output_token(t_lex *lexer)
 	}
 }
 
-t_token *ft_word_token(t_lex *lex)
+t_token	*ft_word_token(t_lex *lex)
 {
-	int start;
+	int	start;
 
 	start = lex->pos;
 	while (lex->input[lex->pos])
 	{
 		if (lex->input[lex->pos] == '\'' || lex->input[lex->pos] == '\"')
 			ext_quote_val(lex, lex->input[lex->pos]);
-		if ((ft_isspace(lex->input[lex->pos]) || lex->input[lex->pos] == '|' ||
-			 lex->input[lex->pos] == '<' || lex->input[lex->pos] == '>') &&
-			!(lex->dq || lex->sq))
-			break;
+		if ((ft_isspace(lex->input[lex->pos]) || lex->input[lex->pos] == '|'
+				|| lex->input[lex->pos] == '<' || lex->input[lex->pos] == '>')
+			&& !(lex->dq || lex->sq))
+			break ;
 		lex->pos++;
 	}
 	if ((lex->dq || lex->sq))
@@ -86,9 +86,9 @@ t_token *ft_word_token(t_lex *lex)
 	return (ft_ext_word_val(start, lex));
 }
 
-t_token *ft_endof_t(void)
+t_token	*ft_endof_t(void)
 {
-	t_token *token;
+	t_token	*token;
 
 	token = (t_token *)malloc(sizeof(t_token));
 	if (!token)

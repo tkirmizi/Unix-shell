@@ -6,16 +6,16 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 13:49:30 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/13 13:49:45 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/14 19:23:15 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-void do_env(t_ms **ms)
+void	do_env(t_ms **ms)
 {
-	int i;
-	t_ms *temp;
+	int		i;
+	t_ms	*temp;
 
 	(*ms)->exit_code = 1;
 	i = -1;
@@ -29,7 +29,7 @@ void do_env(t_ms **ms)
 	(*ms)->exit_code = 0;
 }
 
-void do_exit(t_ms **ms)
+void	do_exit(t_ms **ms)
 {
 	(*ms)->exit_code = 1;
 	ft_write_to_fd(STDERR_FILENO, "exit");

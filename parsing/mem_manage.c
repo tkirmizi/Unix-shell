@@ -6,16 +6,16 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 12:42:07 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/13 12:43:04 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/14 19:15:32 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-char **ft_realloc_array(char **ptr, size_t new_size)
+char	**ft_realloc_array(char **ptr, size_t new_size)
 {
-	char **new_ptr;
-	size_t i;
+	char	**new_ptr;
+	size_t	i;
 
 	i = -1;
 	if (!ptr)
@@ -34,7 +34,6 @@ char **ft_realloc_array(char **ptr, size_t new_size)
 			return (NULL);
 		}
 	}
-	// new_ptr[i] = NULL;
 	i = 0;
 	while (ptr[i])
 		free(ptr[i++]);
@@ -42,12 +41,12 @@ char **ft_realloc_array(char **ptr, size_t new_size)
 	return (new_ptr);
 }
 
-void ft_strnjoin_helper(char *dest, const char *src, size_t n)
+void	ft_strnjoin_helper(char *dest, const char *src, size_t n)
 {
-	size_t i;
+	size_t	i;
 
 	i = 0;
-	while (i < n && src[i] != '\0')
+	while (i < n && src[i])
 	{
 		dest[i] = src[i];
 		i++;
@@ -55,40 +54,39 @@ void ft_strnjoin_helper(char *dest, const char *src, size_t n)
 	dest[i] = '\0';
 }
 
-char *ft_strnjoin(char *s1, const char *s2, size_t n)
+char	*ft_strnjoin(char *s1, const char *s2, size_t n)
 {
-	char *str;
-	size_t len1;
-	size_t i;
+	char	*str;
+	size_t	len1;
+	size_t	len2;
 
-	i = -1;
-	if (!s2)
+	if (s2 == NULL)
 		return (s1);
-	len1 = s1 ? ft_strlen(s1) : 0;
-	if (n > ft_strlen(s2))
-		n = ft_strlen(s2);
-	str = (char *)malloc((len1 + n + 1) * sizeof(char));
-	if (!str)
+	len1 = 0;
+	if (s1)
+		len1 = ft_strlen(s1);
+	len2 = ft_strlen(s2);
+	if (n > len2)
+		n = len2;
+	str = (char *)malloc(sizeof(char) * (len1 + n + 1));
+	if (str == NULL)
 		return (NULL);
-	while (++i < len1)
-		str[i] = s1[i];
-	i = -1;
-	while (++i < n)
-		str[len1 + i] = s2[i];
-	str[len1 + i] = '\0';
+	if (s1)
+		ft_strnjoin_helper(str, s1, len1);
+	ft_strnjoin_helper(str + len1, s2, n);
 	if (s1)
 		free(s1);
 	return (str);
 }
 
-void free_struct(t_env **stack)
+void	free_struct(t_env **stack)
 {
-	t_env *tmp;
-	t_env *current;
+	t_env	*tmp;
+	t_env	*current;
 
 	current = NULL;
 	if (!stack)
-		return;
+		return ;
 	while (current)
 	{
 		tmp = current->next;
@@ -98,7 +96,7 @@ void free_struct(t_env **stack)
 	*stack = NULL;
 }
 
-t_env *find_last(t_env *env_s)
+t_env	*find_last(t_env *env_s)
 {
 	if (NULL == env_s)
 		return (NULL);

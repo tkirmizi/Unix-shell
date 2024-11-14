@@ -6,18 +6,18 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 12:43:45 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/13 12:44:06 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/14 19:13:56 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-void remove_cmd_node(t_ms *mini, t_cmd *node_to_remove)
+void	remove_cmd_node(t_ms *mini, t_cmd *node_to_remove)
 {
-	int i;
+	int	i;
 
 	if (mini == NULL || node_to_remove == NULL)
-		return;
+		return ;
 	if (node_to_remove == mini->cmd)
 		mini->cmd = node_to_remove->next;
 	if (node_to_remove->prev != NULL)
@@ -41,11 +41,11 @@ void remove_cmd_node(t_ms *mini, t_cmd *node_to_remove)
 	free(node_to_remove);
 }
 
-void ft_del_array(char ***array_ptr, int index)
+void	ft_del_array(char ***array_ptr, int index)
 {
-	char **array;
-	int size;
-	int i;
+	char	**array;
+	int		size;
+	int		i;
 
 	i = index;
 	array = *array_ptr;

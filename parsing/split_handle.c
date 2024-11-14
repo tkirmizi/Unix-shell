@@ -6,63 +6,67 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 12:44:44 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/13 12:45:37 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/14 20:49:14 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-int handle_split(t_cmd *cmd, char **split, int i, int original_count)
+int	handle_split(t_cmd *cmd, char **split, int i, int original_count)
 {
-	int split_count;
-	char **new_args;
-	int j;
-	int shift;
-	size_t new_size;
+	t_split	*split_data;
+	char	**new_args;
+	int		j;
+	int		shift;
+	size_t	new_size;
 
-	split_count = 0;
-	while (split[split_count])
-		split_count++;
-	new_size = sizeof(char *) * (original_count + split_count + 1);
+	split_data = (t_split *)malloc(sizeof(t_split));
+	split_data->split_count = 0;
+	while (split[split_data->split_count])
+		split_data->split_count++;
+	new_size = sizeof(char *) * (original_count + split_data->split_count + 1);
 	new_args = ft_realloc_array(cmd->args, new_size);
 	if (!new_args)
 		return (0);
 	cmd->args = new_args;
 	free(cmd->args[i]);
 	cmd->args[i] = ft_strdup(split[0]);
-	if (split_count > 1)
-		handle_split_cont(&cmd, split, &i, &original_count, &split_count);
-	return (split_count);
+	if (split_data->split_count > 1)
+		handle_split_cont(&split_data, split, &i, &original_count);
+	return (split_data->split_count);
 }
 
-void	handle_split_cont(t_cmd **cmd, char **split, int *i, int *original_count, int *split_count)
+void	handle_split_cont(t_split **split_data, char **split, int *i,
+		int *original_count)
 {
-	int shift;
-	int	j;
+	int		shift;
+	int		j;
+	t_split	*temp;
 
+	temp = (*split_data);
 	j = (*original_count) - 1;
-	shift = (*split_count) - 1;
+	shift = (temp->split_count) - 1;
 	while (j > (*i))
 	{
-		(*cmd)->args[j + shift] = (*cmd)->args[j];
+		(temp->cmd)->args[j + shift] = (temp->cmd)->args[j];
 		j--;
 	}
 	j = 1;
-	while (j < (*split_count))
+	while (j < (temp->split_count))
 	{
-		(*cmd)->args[(*i) + j] = ft_strdup(split[j]);
+		(temp->cmd)->args[(*i) + j] = ft_strdup(split[j]);
 		j++;
 	}
-	(*cmd)->args[(*original_count) + shift] = NULL;
+	(temp->cmd)->args[(*original_count) + shift] = NULL;
 }
 
-int handle_split_args(char **split, t_cmd *cmd, int i, int org_count)
+int	handle_split_args(char **split, t_cmd *cmd, int i, int org_count)
 {
-	int split_count;
-	char **new_args;
-	int j;
-	int shift;
-	size_t new_size;
+	int		split_count;
+	char	**new_args;
+	int		j;
+	int		shift;
+	size_t	new_size;
 
 	split_count = 0;
 	while (split[split_count])
@@ -84,12 +88,12 @@ int handle_split_args(char **split, t_cmd *cmd, int i, int org_count)
 	return (split_count);
 }
 
-int handle_expanded(t_cmd *cmd, char *expanded, int i, t_expansion *exp)
+int	handle_expanded(t_cmd *cmd, char *expanded, int i, t_expansion *exp)
 {
-	char **split;
-	int original_count;
-	int split_count;
-	int j;
+	char	**split;
+	int		original_count;
+	int		split_count;
+	int		j;
 
 	j = -1;
 	if (ft_strchr(expanded, ' ') && !exp->in_squote && !exp->in_dquote)
@@ -113,11 +117,11 @@ int handle_expanded(t_cmd *cmd, char *expanded, int i, t_expansion *exp)
 	return (0);
 }
 
-int handle_expanded_arg(char *expanded, t_cmd *cmd, int i, t_expansion *exp)
+int	handle_expanded_arg(char *expanded, t_cmd *cmd, int i, t_expansion *exp)
 {
-	char **split;
-	int org_count;
-	int split_count;
+	char	**split;
+	int		org_count;
+	int		split_count;
 
 	if (ft_strchr(expanded, ' ') && !exp->in_squote && !exp->in_dquote)
 	{

@@ -6,13 +6,13 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 12:30:14 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/13 12:31:09 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/14 19:11:50 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-void ext_quote_val(t_lex *l, char q)
+void	ext_quote_val(t_lex *l, char q)
 {
 	if (q == '\'' && !l->sq && !l->dq)
 		l->sq = 1;
@@ -24,9 +24,9 @@ void ext_quote_val(t_lex *l, char q)
 		l->dq = 0;
 }
 
-t_token *open_quote_val(void)
+t_token	*open_quote_val(void)
 {
-	t_token *token;
+	t_token	*token;
 
 	token = (t_token *)malloc(sizeof(t_token));
 	if (!token)
@@ -37,9 +37,9 @@ t_token *open_quote_val(void)
 	return (token);
 }
 
-t_token *cr_empty_q_t(void)
+t_token	*cr_empty_q_t(void)
 {
-	t_token *token;
+	t_token	*token;
 
 	token = (t_token *)malloc(sizeof(t_token));
 	if (!token)
@@ -49,38 +49,9 @@ t_token *cr_empty_q_t(void)
 	return (token);
 }
 
-char *clean_quotes(char *str)
+int	handle_quote(char *str, t_expansion *exp, char quote_type)
 {
-	char *cleaned;
-	int i = 0, j = 0;
-	int in_squote = 0, in_dquote = 0;
-
-	if (!str)
-		return NULL;
-	cleaned = malloc(strlen(str) + 1);
-	if (!cleaned)
-	{
-		free(str);
-		return NULL;
-	}
-	while (str[i])
-	{
-		if (str[i] == '\'' && !in_dquote)
-			in_squote = !in_squote;
-		else if (str[i] == '\"' && !in_squote)
-			in_dquote = !in_dquote;
-		else
-			cleaned[j++] = str[i];
-		i++;
-	}
-	cleaned[j] = '\0';
-	free(str);
-	return cleaned;
-}
-
-int handle_quote(char *str, t_expansion *exp, char quote_type)
-{
-	size_t start;
+	size_t	start;
 
 	exp->pos++;
 	start = exp->pos;

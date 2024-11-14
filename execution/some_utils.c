@@ -6,15 +6,15 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 13:50:37 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/13 13:54:01 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/14 19:22:42 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-int ft_is_num(char *string)
+int	ft_is_num(char *string)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (string[i])
@@ -26,9 +26,9 @@ int ft_is_num(char *string)
 	return (1);
 }
 
-void ft_write_to_fd(int fd, char *string)
+void	ft_write_to_fd(int fd, char *string)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (string[i])
@@ -36,15 +36,15 @@ void ft_write_to_fd(int fd, char *string)
 	write(fd, "\n", 1);
 }
 
-int ft_isspace(int c)
+int	ft_isspace(int c)
 {
-	return (c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f' ||
-			c == '\r');
+	return (c == ' ' || c == '\t' || c == '\n' || c == '\v'
+		|| c == '\f' || c == '\r');
 }
 
-char *ft_strncpy(char *dst, const char *src, int len)
+char	*ft_strncpy(char *dst, const char *src, int len)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	if (!src)
@@ -62,10 +62,10 @@ char *ft_strncpy(char *dst, const char *src, int len)
 	return (dst);
 }
 
-int ft_command_counter(t_cmd **command)
+int	ft_command_counter(t_cmd **command)
 {
-	t_cmd *temp;
-	int i;
+	t_cmd	*temp;
+	int		i;
 
 	i = 0;
 	temp = (*command);
