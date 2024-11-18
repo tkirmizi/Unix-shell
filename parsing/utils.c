@@ -6,7 +6,7 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 12:47:20 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/13 17:27:01 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/14 22:02:13 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,35 +37,7 @@ int	copy_split_words(char **split, char **args, int i)
 	return (split_count - 1);
 }
 
-// void	ft_eval_args(t_cmd *cmd, t_ms *ms)
-// {
-// 	int			i;
-// 	char		*expanded;
-// 	t_expansion	*exp;
-// 	int			split_count;
-
-// 	if (!cmd || !cmd->args)
-// 		return ;
-// 	exp = init_expansion();
-// 	if (!exp)
-// 		return ;
-// 	exp->last_exit_code = ms->exit_code;
-// 	i = 0;
-// 	while (cmd->args[i])
-// 	{
-// 		expanded = expand_variables(cmd->args[i], exp);
-// 		if (expanded)
-// 		{
-// 			split_count = handle_expanded_arg(expanded, cmd, i, exp);
-// 			i += split_count;
-// 		}
-// 		i++;
-// 	}
-// 	destroy_expansion(exp);
-// }
-
-void	handle_explanded_sec(t_cmd **cmd,
-	char **expanded, int *i, t_expansion **exp)
+void	handle_explanded_sec(t_cmd **cmd, char **expanded, int *i)
 {
 	free((*cmd)->args[*i]);
 	(*cmd)->args[*i] = (*expanded);

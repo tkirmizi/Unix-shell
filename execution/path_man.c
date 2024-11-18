@@ -6,7 +6,7 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 13:51:13 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/14 19:23:11 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/18 11:27:26 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ void	find_exact_path(t_ms **ms, t_cmd **cmd, int *i)
 {
 	t_cmd	*temp;
 
+	(*ms)->exit_code = 0;
 	temp = (*cmd);
 	*i = 0;
 	while (temp->path_for_excat[*i])
@@ -60,4 +61,25 @@ void	find_exact_path(t_ms **ms, t_cmd **cmd, int *i)
 	}
 	ft_write_to_fd(2, "command not found\n");
 	exit(127);
+}
+
+void	update_shell_lvl(t_ms **ms)
+{
+	t_env	*temp;
+	int		new_shlvl;
+	char	*old_value;
+
+	temp = (*ms)->env_s;
+	while (temp)
+	{
+		if (ft_strncmp(temp->env_name, "SHLVL", 5) == 0)
+			break ;
+		temp = temp->next;
+	}
+	new_shlvl = ft_atoi(temp->env_value);
+	new_shlvl += 1;
+	old_value = temp->env_value;
+	temp->env_value = ft_itoa(new_shlvl);
+	free(old_value);
+	update_path(ms);
 }

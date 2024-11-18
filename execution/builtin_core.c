@@ -6,7 +6,7 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 13:43:39 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/14 19:30:24 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/15 11:37:44 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,8 @@ int	ft_is_builtin(t_cmd **cmd)
 	ft_set_builtin(*cmd);
 	while (i < 6)
 	{
-		if (!(ft_strncmp((*cmd)->args[0], (*cmd)->builtin[i],
-					ft_strlen((*cmd)->args[0]))))
+		if (!(ft_strncmp(temp->args[0], temp->builtin[i],
+					ft_strlen(temp->args[0]))))
 			return (i);
 		i++;
 	}

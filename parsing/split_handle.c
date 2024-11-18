@@ -6,7 +6,7 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 12:44:44 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/14 20:49:14 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/14 22:08:31 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,6 @@ int	handle_split(t_cmd *cmd, char **split, int i, int original_count)
 {
 	t_split	*split_data;
 	char	**new_args;
-	int		j;
-	int		shift;
 	size_t	new_size;
 
 	split_data = (t_split *)malloc(sizeof(t_split));
@@ -113,7 +111,7 @@ int	handle_expanded(t_cmd *cmd, char *expanded, int i, t_expansion *exp)
 			return (-1);
 		return (split_count - 1);
 	}
-	handle_explanded_sec(&cmd, &expanded, &i, &exp);
+	handle_explanded_sec(&cmd, &expanded, &i);
 	return (0);
 }
 

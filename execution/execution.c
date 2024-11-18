@@ -6,7 +6,7 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 13:37:20 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/14 19:27:49 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/18 11:06:16 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ void	execution(t_ms *ms)
 	int	count_command;
 	int	status;
 
+	status = 0;
 	count_command = ft_command_counter(&(ms->cmd));
 	if (strcmp(ms->cmd->args[0], "exit") == 0)
 		do_exit(&ms);
@@ -51,9 +52,7 @@ void	one_exec(t_ms **ms, t_cmd **cmd)
 {
 	int		i;
 	t_cmd	*temp;
-	int		j;
 
-	j = 0;
 	temp = (*cmd);
 	dup2((*cmd)->fd_in, STDIN_FILENO);
 	dup2((*cmd)->fd_out, STDOUT_FILENO);
@@ -89,9 +88,7 @@ void	exec_for_multi(t_ms **ms, t_cmd **cmd)
 {
 	int		i;
 	t_cmd	*temp;
-	int		j;
 
-	j = 0;
 	temp = (*cmd);
 	if (ft_is_builtin(cmd) != 10)
 		do_builtin(ms, cmd);

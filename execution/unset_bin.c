@@ -6,7 +6,7 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 13:49:07 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/14 19:22:10 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/15 11:40:10 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,10 @@
 
 void	do_unset(t_ms **ms)
 {
-	t_env	*temp;
 	int		i;
 
 	(*ms)->exit_code = 1;
 	i = 1;
-	temp = (*ms)->env_s;
 	while ((*ms)->cmd->args[i] != NULL)
 	{
 		unset_itself(ms, (*ms)->cmd->args[i]);
@@ -51,12 +49,12 @@ void	unset_itself(t_ms **ms, char *string)
 	}
 	else
 	{
-		unset_else(ms, temp, temp2, string);
+		unset_else(ms, temp, temp2);
 		update_path(ms);
 	}
 }
 
-void	unset_else(t_ms **ms, t_env *temp, t_env *temp2, char *string)
+void	unset_else(t_ms **ms, t_env *temp, t_env *temp2)
 {
 	if (!(ft_strncmp(temp->env_name, (*ms)->env_s->env_name,
 				ft_strlen(temp->env_name))))

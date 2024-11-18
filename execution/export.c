@@ -6,7 +6,7 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 13:46:50 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/14 19:23:53 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/14 22:17:21 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@ void	export_itself(t_ms **ms, char *string)
 	temp = (*ms)->env_s;
 	after_eq = ft_strnstr(string, "=", ft_strlen(string));
 	before_eq = NULL;
+	before_len = 0;
 	if (after_eq != NULL)
 	{
 		before_len = after_eq - string;
@@ -103,6 +104,7 @@ void	check_export_exist(t_ms **ms, char *string)
 	temp = (*ms)->env_s;
 	after_eq = ft_strnstr(string, "=", ft_strlen(string));
 	before_eq = NULL;
+	before_len = 0;
 	if (after_eq != NULL)
 	{
 		before_len = after_eq - string;

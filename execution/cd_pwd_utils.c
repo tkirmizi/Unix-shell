@@ -6,7 +6,7 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 13:46:16 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/14 19:29:29 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/15 11:38:20 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,10 +38,8 @@ char	*cur_pwd_return(t_ms **ms)
 void	do_pwd(t_ms **ms)
 {
 	t_env	*temp;
-	int		i;
 	int		len;
 
-	i = 0;
 	(*ms)->exit_code = 1;
 	temp = (*ms)->env_s;
 	redir_for_builtin(ms);

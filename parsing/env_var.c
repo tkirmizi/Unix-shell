@@ -6,7 +6,7 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 12:40:27 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/14 19:18:52 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/18 12:07:28 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,22 +48,72 @@ t_env	*ft_save_env(char **env, t_env *env_struct)
 	return (env_struct);
 }
 
+// void	ft_set_node(t_env **env_s, char *token, char *type)
+// {
+// 	t_env	*node;
+// 	t_env	*last_node;
+
+// 	if (NULL == env_s)
+// 		return ;
+// 	node = malloc(sizeof(t_env));
+// 	if (!node)
+// 	{
+// 		free(token);
+// 		free(type);
+// 		free_struct(env_s);
+// 		return ;
+// 	}
+// 	node->next = NULL;
+// 	node->env_name = ft_strdup(token);
+// 	if (!node->env_name)
+// 	{
+// 		free(node);
+// 		free(token);
+// 		free(type);
+// 		free_struct(env_s);
+// 		exit_w_out_free("error: malloc", 1);
+// 	}
+// 	free(token);
+// 	if (type)
+// 	{
+// 		node->env_value = ft_strdup(type);
+// 		if (!node->env_value)
+// 		{
+// 			free(node->env_name);
+// 			free(node);
+// 			free(type);
+// 			free_struct(env_s);
+// 			exit_w_out_free("error: malloc", 1);
+// 		}
+// 		free(type);
+// 	}
+// 	if (NULL == *env_s)
+// 		*env_s = node;
+// 	else
+// 	{
+// 		last_node = find_last(*env_s);
+// 		last_node->next = node;
+// 	}
+// }
+
 void	ft_set_node(t_env **env_s, char *token, char *type)
 {
 	t_env	*node;
 	t_env	*last_node;
 
-	if (NULL == env_s)
-		return ;
 	node = malloc(sizeof(t_env));
-	if (NULL == node)
-		return (free_struct(env_s), (void) NULL);
+	if (!node)
+		del_set_node_first(env_s, &token, &type);
 	node->next = NULL;
 	node->env_name = ft_strdup(token);
+	if (!node->env_name)
+		del_set_node_sec(env_s, &token, &type, &node);
 	free(token);
 	if (type)
 	{
 		node->env_value = ft_strdup(type);
+		if (!node->env_value)
+			del_set_node_tr(env_s, &token, &type, &node);
 		free(type);
 	}
 	if (NULL == *env_s)

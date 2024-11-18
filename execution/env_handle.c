@@ -6,7 +6,7 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 13:47:37 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/14 19:28:52 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/18 11:18:36 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@ void	update_path(t_ms **ms)
 {
 	t_env	*temp;
 	int		i;
-	char	**old_env;
 
 	i = 0;
 	temp = (*ms)->env_s;
@@ -25,8 +24,9 @@ void	update_path(t_ms **ms)
 		i++;
 		temp = temp->next;
 	}
-	old_env = (*ms)->env;
 	(*ms)->env = (char **)malloc((i + 1) * sizeof(char *));
+	if (!(*ms)->env)
+		return ;
 	(*ms)->env[i] = NULL;
 	temp = (*ms)->env_s;
 	fill_array(ms, temp, 0);
@@ -34,17 +34,22 @@ void	update_path(t_ms **ms)
 
 void	fill_array(t_ms **ms, t_env *temp, int i)
 {
-	char	*tmp;
+	char	*tmp1;
+	char	*tmp2;
 
 	while (temp != NULL)
 	{
-		(*ms)->env[i] = ft_strdup(temp->env_name);
-		tmp = (*ms)->env[i];
-		(*ms)->env[i] = ft_strjoin((*ms)->env[i], "=");
-		free(tmp);
-		tmp = (*ms)->env[i];
-		(*ms)->env[i] = ft_strjoin((*ms)->env[i], temp->env_value);
-		free(tmp);
+		tmp1 = ft_strdup(temp->env_name);
+		if (!tmp1)
+			return ;
+		tmp2 = ft_strjoin(tmp1, "=");
+		free(tmp1);
+		if (!tmp2)
+			return ;
+		(*ms)->env[i] = ft_strjoin(tmp2, temp->env_value);
+		free(tmp2);
+		if (!(*ms)->env[i])
+			return ;
 		i++;
 		temp = temp->next;
 	}
@@ -52,19 +57,19 @@ void	fill_array(t_ms **ms, t_env *temp, int i)
 
 void	cleanup_env(t_env *env_s)
 {
-	t_env	*current;
+	t_env	*temp;
 	t_env	*next;
 
-	current = env_s;
-	while (current)
+	temp = env_s;
+	while (temp)
 	{
-		next = current->next;
-		if (current->env_name)
-			free(current->env_name);
-		if (current->env_value)
-			free(current->env_value);
-		free(current);
-		current = next;
+		next = temp->next;
+		if (temp->env_name)
+			free(temp->env_name);
+		if (temp->env_value)
+			free(temp->env_value);
+		free(temp);
+		temp = next;
 	}
 }
 

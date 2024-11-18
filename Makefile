@@ -7,47 +7,15 @@ LDFLAGS = -L./libft -lft -lreadline
 LIBFT = libft/libft.a
 LIBFT_DIR = libft
 
-SRCS = minishell.c \
-		signal_handler.c \
-		parsing/arg_process.c \
-		parsing/command_display.c \
-		parsing/command_struct.c \
-		parsing/env_var.c \
-		parsing/error.c \
-		parsing/exp_handle_cont.c \
-		parsing/exp_handle.c \
-		parsing/heredoc.c \
-		parsing/lex_init.c \
-		parsing/mem_manage.c \
-		parsing/node_manage.c \
-		parsing/other_utils.c \
-		parsing/parse.c \
-		parsing/process_var.c \
-		parsing/quote_handle.c \
-		parsing/quote.c \
-		parsing/redir.c \
-		parsing/split_handle.c \
-		parsing/split.c \
-		parsing/token_manage.c \
-		parsing/token_type.c \
-		parsing/utils.c \
-		execution/builtin_core.c \
-		execution/cd_pwd_utils.c \
-		execution/cd_pwd.c \
-		execution/echo.c \
-		execution/env_handle.c \
-		execution/exec_cont.c \
-		execution/execution.c \
-		execution/export.c \
-		execution/fds_handle.c \
-		execution/main.c \
-		execution/mem_utils.c \
-		execution/other_bin.c \
-		execution/path_man.c \
-		execution/pipe_handle.c \
-		execution/some_utils.c \
-		execution/unset_bin.c \
-
+SRCS = 	parsing/signal.c parsing/arg_process.c parsing/command_display.c parsing/command_struct.c parsing/env_var.c \
+		parsing/error.c parsing/exp_handle_cont.c parsing/exp_handle.c parsing/heredoc.c parsing/lex_init.c \
+		parsing/mem_manage.c parsing/node_manage.c parsing/other_utils.c parsing/parse.c parsing/process_var.c \
+		parsing/quote_handle.c parsing/quote.c parsing/redir.c parsing/split_handle.c parsing/split.c \
+		parsing/token_manage.c parsing/token_type.c parsing/utils.c execution/builtin_core.c execution/cd_pwd_utils.c \
+		execution/cd_pwd.c execution/echo.c execution/env_handle.c execution/exec_cont.c execution/execution.c \
+		execution/export.c execution/fds_handle.c execution/main.c execution/mem_utils.c execution/other_bin.c \
+		execution/path_man.c execution/pipe_handle.c execution/some_utils.c execution/unset_bin.c parsing/other.c \
+		parsing/del_node.c \
 
 OBJS = $(SRCS:.c=.o)
 

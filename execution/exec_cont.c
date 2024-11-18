@@ -6,7 +6,7 @@
 /*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 13:38:25 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/14 21:02:16 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/18 11:20:35 by tkirmizi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,11 +78,12 @@ void	multi_exec(t_ms **ms, int cmd_count)
 
 	fds = malloc(sizeof(*fds) * (cmd_count - 1));
 	data.fds = fds;
-	data.cmd_count = cmd_count;
-	data.pids = (pid_t *)malloc(cmd_count * sizeof(pid_t));
-	data.cmd_index = 0;
+	data_alloc(&data, cmd_count);
 	if (!data.pids)
+	{
+		free(fds);
 		return ;
+	}
 	init_pipes(&data);
 	cmd = (*ms)->cmd;
 	while (cmd)
@@ -94,4 +95,5 @@ void	multi_exec(t_ms **ms, int cmd_count)
 	close_pipe_fds(&data);
 	wait_for_children(ms, &data);
 	free(data.pids);
+	free(fds);
 }
