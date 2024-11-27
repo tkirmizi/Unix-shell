@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
+/*   By: taha <taha@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 13:36:12 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/18 11:21:58 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/27 20:56:58 by taha             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ int	g_signal = 0;
 int	process_input(t_ms *ms)
 {
 	g_signal = 0;
-	ms->input = readline("user@user : ");
+	ms->input = readline("tahashell@ : ");
 	if (!ms->input)
 		return (write(1, "exit\n", 5), 0);
 	add_history(ms->input);

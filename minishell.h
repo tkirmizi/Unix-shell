@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tkirmizi <tkirmizi@student.42.fr>          +#+  +:+       +#+        */
+/*   By: taha <taha@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 15:28:50 by tkirmizi          #+#    #+#             */
-/*   Updated: 2024/11/18 12:08:14 by tkirmizi         ###   ########.fr       */
+/*   Updated: 2024/11/27 20:49:56 by taha             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# include "../libft/libft.h"
+# include "libft/libft.h"
 # include <errno.h>
 # include <fcntl.h>
 # include <stdbool.h>
